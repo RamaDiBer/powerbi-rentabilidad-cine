@@ -1,0 +1,180 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "59598bb2d45dc57e017b",
+  "position": {
+    "x": 821.0834447833862,
+    "y": 0,
+    "z": 1000,
+    "height": 718.90964280884191,
+    "width": 459.16660405427746,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "ROI Genero"
+                }
+              },
+              "queryRef": "Medidas.ROI Genero",
+              "nativeQueryRef": "ROI Genero"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Presupuesto Total"
+                }
+              },
+              "queryRef": "Medidas.Presupuesto Total",
+              "nativeQueryRef": "Presupuesto Total"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Ingresos Totales"
+                }
+              },
+              "queryRef": "Medidas.Ingresos Totales",
+              "nativeQueryRef": "Ingresos Totales"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Medidas"
+                  }
+                },
+                "Property": "ROI Genero"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "117.65347437432675D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.Presupuesto Total"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "142.1314884459397D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.Ingresos Totales"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "66.76323082184642D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.ROI Genero"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {}
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "8cbc68eb3c3477044536",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Medidas"
+              }
+            },
+            "Property": "ROI Genero"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "024f30eac3d40003529c",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Medidas"
+              }
+            },
+            "Property": "Presupuesto Total"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "6383910ab207ab480d9b",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Medidas"
+              }
+            },
+            "Property": "Ingresos Totales"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

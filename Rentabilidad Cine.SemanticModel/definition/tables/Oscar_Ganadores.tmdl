@@ -1,0 +1,54 @@
+/// Una fila por persona premiada: quién ganó, en qué categoría, en qué año y por qué película.
+table Oscar_Ganadores
+	lineageTag: fc4aac71-2b08-4ed6-afc0-29544a8ad954
+
+	column Id_Pelicula
+		isNameInferred
+		sourceColumn: [Id_Pelicula]
+
+	column 'Año ceremonia'
+		isNameInferred
+		sourceColumn: [Año ceremonia]
+
+	column Categoría
+		isNameInferred
+		sourceColumn: [Categoría]
+
+	column Área
+		isNameInferred
+		sourceColumn: [Área]
+
+	column Ganador
+		isNameInferred
+		sourceColumn: [Ganador]
+
+	partition Oscar_Ganadores = calculated
+		mode: import
+		source =
+				VAR Base =
+				    ADDCOLUMNS(
+				        Fact_Oscars,
+				        "@Lista", SUBSTITUTE(Fact_Oscars[Premiados], "/", "|")
+				    )
+				VAR Filas =
+				    GENERATE(
+				        Base,
+				        VAR L = [@Lista]
+				        RETURN
+				            SELECTCOLUMNS(
+				                GENERATESERIES(1, MAX(PATHLENGTH(L), 1)),
+				                "@Nombre", TRIM(PATHITEM(L, [Value]))
+				            )
+				    )
+				RETURN
+				    SELECTCOLUMNS(
+				        FILTER(Filas, [@Nombre] <> ""),
+				        "Id_Pelicula", Fact_Oscars[Id_Pelicula],
+				        "Año ceremonia", Fact_Oscars[Anio_Ceremonia],
+				        "Categoría", Fact_Oscars[Categoria],
+				        "Área", Fact_Oscars[Area_Premio],
+				        "Ganador",
+				            VAR N = [@Nombre]
+				            RETURN IF(CONTAINSSTRING(N, " - "), TRIM(MID(N, SEARCH(" - ", N) + 3, 200)), N)
+				    )
+

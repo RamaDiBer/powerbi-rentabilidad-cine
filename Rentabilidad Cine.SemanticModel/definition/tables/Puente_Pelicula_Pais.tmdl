@@ -1,0 +1,57 @@
+table Puente_Pelicula_Pais
+	lineageTag: 15091242-4e3e-472b-92c6-3fb8845f7aea
+
+	column Fila_Excel
+		dataType: int64
+		formatString: 0
+		lineageTag: 7cb266f0-854f-4cef-8af0-46b00664f6fd
+		summarizeBy: none
+		sourceColumn: Fila_Excel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pais_Produccion
+		dataType: string
+		lineageTag: fe568b89-5af6-4a42-92b1-933dc1edb96c
+		summarizeBy: none
+		sourceColumn: Pais_Produccion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Puente_Pelicula_Pais = m
+		mode: import
+		queryGroup: '5. Modelo'
+		source =
+				let
+				    Origen = Peliculas_Geografia_Final,
+				    Columnas = Table.SelectColumns(
+				        Origen,
+				        {"Fila_Excel", "Lista_Paises_Produccion"}
+				    ),
+				    ConPais = Table.SelectRows(
+				        Columnas,
+				        each not List.IsEmpty([Lista_Paises_Produccion])
+				    ),
+				    Expandida = Table.ExpandListColumn(
+				        ConPais,
+				        "Lista_Paises_Produccion"
+				    ),
+				    Renombrada = Table.RenameColumns(
+				        Expandida,
+				        {{"Lista_Paises_Produccion", "Pais_Produccion"}}
+				    ),
+				    SinDuplicados = Table.Distinct(Renombrada),
+				    Tipos = Table.TransformColumnTypes(
+				        SinDuplicados,
+				        {
+				            {"Fila_Excel", Int64.Type},
+				            {"Pais_Produccion", type text}
+				        }
+				    )
+				in
+				    Tipos
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,235 @@
+table Fact_Oscars
+	lineageTag: a64854e6-02c5-4a8c-af00-8423480b8505
+
+	column Id_Pelicula
+		dataType: int64
+		formatString: 0
+		lineageTag: 8046f3ff-8793-474f-b913-99e43807dd08
+		summarizeBy: none
+		sourceColumn: Id_Pelicula
+
+		annotation SummarizationSetBy = Automatic
+
+	column Anio_Ceremonia
+		dataType: int64
+		formatString: 0
+		lineageTag: feb4b582-9bad-4c30-9bde-69dfabe295a1
+		summarizeBy: sum
+		sourceColumn: Anio_Ceremonia
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categoria_Original
+		dataType: string
+		lineageTag: d8cdb5b0-486f-41e3-a05f-4ad925af2f37
+		summarizeBy: none
+		sourceColumn: Categoria_Original
+
+		annotation SummarizationSetBy = Automatic
+
+	column Premio_Original
+		dataType: string
+		lineageTag: 16ff90e5-4889-41bb-89aa-acccbed0f50c
+		summarizeBy: none
+		sourceColumn: Premio_Original
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fila_Origen_Oscar
+		dataType: int64
+		formatString: 0
+		lineageTag: 6648387a-65ab-448a-b24c-cefb5291b8e8
+		summarizeBy: sum
+		sourceColumn: Fila_Origen_Oscar
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Integracion_Oscar
+		dataType: string
+		lineageTag: f44adcd1-6aa5-4651-abf7-bc2cfcb30796
+		summarizeBy: none
+		sourceColumn: Estado_Integracion_Oscar
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categoria
+		dataType: string
+		lineageTag: 52115482-179b-4077-b7b5-e72e8b314a71
+		summarizeBy: none
+		sourceColumn: Categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column Area_Premio
+		dataType: string
+		lineageTag: caeb30a4-076a-4a75-94c7-385e698e5530
+		summarizeBy: none
+		sourceColumn: Area_Premio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Premiados
+		dataType: string
+		lineageTag: 76de6e72-82e7-406a-a4b6-db523dd5bde8
+		summarizeBy: none
+		sourceColumn: Premiados
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cantidad_Premiados
+		dataType: int64
+		formatString: 0
+		lineageTag: 61b9207e-7a93-4fe6-9f54-99faa062a7ae
+		summarizeBy: sum
+		sourceColumn: Cantidad_Premiados
+
+		annotation SummarizationSetBy = Automatic
+
+	column Premiado_Principal
+		dataType: string
+		lineageTag: a9314549-b477-4477-82fb-22d5fb10210d
+		summarizeBy: none
+		sourceColumn: Premiado_Principal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Oscars = m
+		mode: import
+		queryGroup: '5. Modelo'
+		source =
+				let
+				    Origen = Oscars_Preparados,
+				
+				    Vinculados = Table.SelectRows(
+				        Origen,
+				        each [Id_Pelicula] <> null
+				            and [Estado_Dato_Premio] = "Con detalle de premios"
+				    ),
+				
+				    Columnas = Table.SelectColumns(
+				        Vinculados,
+				        {
+				            "Id_Pelicula",
+				            "Anio_Ceremonia",
+				            "Categoria_Original",
+				            "Premio_Original",
+				            "Fila_Origen_Oscar",
+				            "Estado_Integracion_Oscar"
+				        }
+				    ),
+				
+				    // Categoría en español, unificando los nombres que la Academia
+				    // usó en distintas épocas (por ejemplo "Actor" y
+				    // "Actor In A Leading Role" son el mismo premio).
+				    Normalizar = (categoria as nullable text) as record =>
+				        let
+				            C = if categoria = null then "" else categoria,
+				            Tiene = (texto as text) => Text.Contains(C, texto, Comparer.OrdinalIgnoreCase),
+				            Empieza = (texto as text) => Text.StartsWith(C, texto, Comparer.OrdinalIgnoreCase)
+				        in
+				            if Empieza("Directing") then
+				                [Categoria = "Mejor director", Area = "Dirección"]
+				            else if List.Contains(
+				                {"Best Picture", "Best Motion Picture", "Outstanding Motion Picture", "Outstanding Production"},
+				                C
+				            ) then
+				                [Categoria = "Mejor película", Area = "Película"]
+				            else if Empieza("Actress") then
+				                [Categoria = "Mejor actriz", Area = "Actuación"]
+				            else if Empieza("Actor") then
+				                [Categoria = "Mejor actor", Area = "Actuación"]
+				            else if Empieza("Writing") then
+				                if Tiene("Not Previously") or Tiene("Original")
+				                    or Tiene("Written Directly") or Tiene("Motion Picture Story")
+				                    or C = "Writing (Story And Screenplay)"
+				                then
+				                    [Categoria = "Mejor guion original", Area = "Guion"]
+				                else if Tiene("Adapted") or Tiene("Another Medium")
+				                    or Tiene("Previously Produced")
+				                then
+				                    [Categoria = "Mejor guion adaptado", Area = "Guion"]
+				                else
+				                    [Categoria = "Mejor guion (sin distinción)", Area = "Guion"]
+				            else if Empieza("Music") then
+				                if Tiene("Song") then
+				                    [Categoria = "Mejor canción original", Area = "Música"]
+				                else
+				                    [Categoria = "Mejor banda sonora", Area = "Música"]
+				            else if Empieza("Production Design") or Empieza("Art Direction") then
+				                [Categoria = "Mejor diseño de producción", Area = "Diseño"]
+				            else
+				                [Categoria = C, Area = "Otra"],
+				
+				    ConCategoria = Table.AddColumn(
+				        Columnas,
+				        "Normalizada",
+				        each Normalizar([Categoria_Original]),
+				        type [Categoria = text, Area = text]
+				    ),
+				
+				    Expandida = Table.ExpandRecordColumn(
+				        ConCategoria,
+				        "Normalizada",
+				        {"Categoria", "Area"},
+				        {"Categoria", "Area_Premio"}
+				    ),
+				
+				    // Premio_Original = Categoria_Original + " (premiados)".
+				    // Separamos lo que está entre paréntesis para no perderlo.
+				    ConPremiados = Table.AddColumn(
+				        Expandida,
+				        "Premiados",
+				        each
+				            let
+				                Premio = Text.Trim([Premio_Original]),
+				                Resto =
+				                    if [Categoria_Original] <> null
+				                        and Text.StartsWith(Premio, [Categoria_Original])
+				                    then Text.Trim(Text.Range(Premio, Text.Length([Categoria_Original])))
+				                    else "",
+				                SinParentesis =
+				                    if Text.StartsWith(Resto, "(") and Text.EndsWith(Resto, ")")
+				                    then Text.Trim(Text.Middle(Resto, 1, Text.Length(Resto) - 2))
+				                    else Resto
+				            in
+				                if SinParentesis = "" then null else SinParentesis,
+				        type text
+				    ),
+				
+				    ConCantidad = Table.AddColumn(
+				        ConPremiados,
+				        "Cantidad_Premiados",
+				        each
+				            if [Premiados] = null then 0
+				            else List.Count(Text.Split([Premiados], "/")),
+				        Int64.Type
+				    ),
+				
+				    // Primer nombre de la lista, útil para gráficos por persona.
+				    ConPrincipal = Table.AddColumn(
+				        ConCantidad,
+				        "Premiado_Principal",
+				        each
+				            if [Premiados] = null then null
+				            else Text.Trim(Text.Split([Premiados], "/"){0}),
+				        type text
+				    ),
+				
+				    Tipos = Table.TransformColumnTypes(
+				        ConPrincipal,
+				        {
+				            {"Id_Pelicula", Int64.Type},
+				            {"Anio_Ceremonia", Int64.Type},
+				            {"Categoria_Original", type text},
+				            {"Premio_Original", type text},
+				            {"Fila_Origen_Oscar", Int64.Type},
+				            {"Estado_Integracion_Oscar", type text}
+				        }
+				    )
+				in
+				    Tipos
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

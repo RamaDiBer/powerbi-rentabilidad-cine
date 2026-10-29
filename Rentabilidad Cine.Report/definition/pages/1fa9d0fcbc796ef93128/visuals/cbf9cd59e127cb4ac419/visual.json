@@ -1,0 +1,94 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "cbf9cd59e127cb4ac419",
+  "position": {
+    "x": 645,
+    "y": 72,
+    "z": 3000,
+    "height": 633,
+    "width": 615,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "6. Subgéneros: sumar etiquetas no ayuda. ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "Contando cada película en todos sus subgéneros, Animación (183 %) y Familia (137 %) son los que más suman, y Western (33 %) e Historia (54 %) los que menos. Terror como subgénero rinde 73 %: funciona como propuesta principal, no como agregado. Las películas con 1 subgénero (109 %) superan a las de 3 (79 %) o 4 (69 %).",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "7. Cada década rinde menos. ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "El ROI mediano baja de 219 % en los 80 a 108 % en los 90, 67 % en los 2000 y 25 % en los 2020 (pandemia y streaming). En dólares de 2025, el presupuesto mediano tuvo su pico en los 90 (55 M).",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "8. Los atípicos distorsionaban el promedio. ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "Se excluyeron 104 películas con datos imposibles o relaciones extremas. El ROI Promedio bajó de valores de millones de % a 372 %, mientras que la mediana casi no cambió (de 96 % a 99 %). Por eso usamos la mediana como indicador principal.",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Recomendación. ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "Para invertir con menor riesgo conviene apostar por la calidad del producto y elegir un extremo del presupuesto: películas de bajo costo en géneros con público fiel (terror) o grandes producciones de animación y aventura. Conviene evitar el presupuesto medio en drama, suspense e historia.",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

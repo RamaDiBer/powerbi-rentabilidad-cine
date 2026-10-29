@@ -1,0 +1,52 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "901f2c76bbba305a7416",
+  "position": {
+    "x": 0,
+    "y": 288.57142857142861,
+    "z": 0,
+    "height": 430,
+    "width": 1260,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Ganancia_estimada_base"
+                }
+              },
+              "queryRef": "base_the_movies.Ganancia_estimada_base",
+              "nativeQueryRef": "Ganancia_estimada_base"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "ROI"
+                }
+              },
+              "queryRef": "base_the_movies.ROI_retorno_de_inversion_base",
+              "nativeQueryRef": "ROI"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "a62d1a3a4139a1c8ceb6",
+  "position": {
+    "x": 20,
+    "y": 72,
+    "z": 2000,
+    "height": 110,
+    "width": 400,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Películas atípicas excluidas"
+                }
+              },
+              "queryRef": "Medidas.Películas atípicas excluidas",
+              "nativeQueryRef": "Películas atípicas excluidas"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Peliculas Evaluables"
+                }
+              },
+              "queryRef": "Medidas.Peliculas Evaluables",
+              "nativeQueryRef": "Peliculas Evaluables"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Rentabilidad Cine"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "9501c893-0e88-4eea-a4fd-7322d706a979"
+  }
+}

@@ -1,0 +1,443 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "587c88cc1ab168678be0",
+  "position": {
+    "x": 11.013091855431925,
+    "y": 0,
+    "z": 0,
+    "height": 515.167963459649,
+    "width": 1233.4662878083757,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "📊 Método de Cálculo Estándar (La Regla del 2.5x)",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "20px"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "La industria cinematográfica utiliza un factor de ",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": "2.5 veces el presupuesto de producción",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " para estimar el punto exacto donde una película deja de perder dinero y empieza a dar ganancias.",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "La fórmula matemática para estimar la ganancia neta es:",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "\\(\\text{Ganancia\\ Estimada}=\\text{Ingresos\\ Totales\\ (Taquilla)}-(\\text{Presupuesto}\\times 2.5)\\)",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "🧮 Ejemplo Práctico con Números Reales",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Si una película tuvo un presupuesto de ",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": "$100 millones",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " y recaudó ",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": "$300 millones",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " en taquilla:",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Calcula el punto de equilibrio:",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " $100M × 2.5 = ",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": "$250 millones",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " (Esto es lo que necesita recaudar solo para recuperar la inversión + marketing + reparto de cines).",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  }
+                ],
+                "listType": "ordered"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Resta los ingresos:",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " $300M - $250M = ",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": "$50 millones de ganancia neta estimada",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " para el estudio.",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  }
+                ],
+                "listType": "ordered"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "🔎 ¿Por qué se multiplica el presupuesto por 2.5?",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "20px"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Si solo restaras ",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": "Ingresos - Presupuesto",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontStyle": "italic",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " ($300M - $100M = $200M), el resultado sería falso porque estarías ignorando dos factores críticos:",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "El Marketing (Publicidad):",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " Los comerciales, pósters y giras de prensa no están incluidos en el presupuesto de producción. Suelen costar entre el ",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": "50% y el 100% adicional",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " del presupuesto original.",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  }
+                ],
+                "listType": "bullet"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "La división con los cines:",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": " Las salas de cine se quedan, en promedio, con el ",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": "50% de cada boleto vendido",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  },
+                  {
+                    "value": ". El estudio cinematográfico solo recibe la otra mitad.",
+                    "textStyle": {
+                      "fontFamily": "Google Sans, Arial, sans-serif, Noto Color Emoji",
+                      "fontSize": "16px"
+                    }
+                  }
+                ],
+                "listType": "bullet"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "El premio a la "
+                  },
+                  {
+                    "value": "Mejor Película",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": " ha cambiado de nombre oficial varias veces a lo largo de la historia de la Academia (desde 1927). En la base de datos de los Oscar, según el año de la ceremonia, figura bajo cualquiera de las siguientes denominaciones:"
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "1927 / 1928 (1.ª Ceremonia):",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": " OUTSTANDING PICTURE y UNIQUE AND ARTISTIC PRODUCTION (en el primer año se entregaron dos premios equivalentes a la mejor producción)."
+                  }
+                ],
+                "listType": "bullet"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "1929 – 1940:",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": " OUTSTANDING PRODUCTION"
+                  }
+                ],
+                "listType": "bullet"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "1941 – 1943:",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": " OUTSTANDING MOTION PICTURE"
+                  }
+                ],
+                "listType": "bullet"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "1944 – 1961:",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": " BEST MOTION PICTURE"
+                  }
+                ],
+                "listType": "bullet"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "1962 – Actualidad:",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": " BEST PICTURE"
+                  }
+                ],
+                "listType": "bullet"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

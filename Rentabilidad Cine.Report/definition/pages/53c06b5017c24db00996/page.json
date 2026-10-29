@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "53c06b5017c24db00996",
+  "displayName": "Óscars",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280
+}

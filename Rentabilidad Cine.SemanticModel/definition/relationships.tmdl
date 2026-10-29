@@ -1,0 +1,19 @@
+relationship 2ce01ad2-e291-5e66-098a-dfa2903d5bef
+	crossFilteringBehavior: bothDirections
+	fromColumn: Puente_Pelicula_Pais.Fila_Excel
+	toColumn: Fact_Peliculas.Id_Pelicula
+
+relationship AutoDetected_2f2cba05-ce5f-49e8-b6cf-38aa85b965b7
+	fromColumn: Fact_Oscars.Id_Pelicula
+	toColumn: Fact_Peliculas.Id_Pelicula
+
+relationship AutoDetected_bada525b-7e79-41c2-8826-7c5eac9de847
+	crossFilteringBehavior: bothDirections
+	fromColumn: Puente_Pelicula_Subgenero.Id_Pelicula
+	toColumn: Fact_Peliculas.Id_Pelicula
+
+relationship Oscar_Ganadores_Id_Pelicula_Fact_Peliculas_Id_Pelicula
+	crossFilteringBehavior: bothDirections
+	fromColumn: Oscar_Ganadores.Id_Pelicula
+	toColumn: Fact_Peliculas.Id_Pelicula
+

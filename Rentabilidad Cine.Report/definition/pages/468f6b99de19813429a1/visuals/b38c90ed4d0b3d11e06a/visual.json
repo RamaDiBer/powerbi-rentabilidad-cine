@@ -1,0 +1,112 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "b38c90ed4d0b3d11e06a",
+  "position": {
+    "x": 848.0080728682583,
+    "y": 145.61754786626656,
+    "z": 3000,
+    "height": 573.90445335528591,
+    "width": 431.95793610749661,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Puente_Pelicula_Subgenero"
+                    }
+                  },
+                  "Property": "Subgénero"
+                }
+              },
+              "queryRef": "Puente_Pelicula_Subgenero.Subgénero",
+              "nativeQueryRef": "Subgénero"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Total Películas"
+                }
+              },
+              "queryRef": "Medidas.Total Películas",
+              "nativeQueryRef": "Total Películas"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "ROI Promedio"
+                }
+              },
+              "queryRef": "Medidas.ROI Promedio",
+              "nativeQueryRef": "ROI Promedio"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "ROI Genero"
+                }
+              },
+              "queryRef": "Medidas.ROI Genero",
+              "nativeQueryRef": "ROI Genero"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Medidas"
+                  }
+                },
+                "Property": "Total Películas"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

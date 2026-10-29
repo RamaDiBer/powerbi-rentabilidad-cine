@@ -1,0 +1,2000 @@
+/// Carpeta con las fuentes (Excel/CSV). Cambiarla si el proyecto está en otra ruta en la otra PC.
+expression Carpeta_Datos = "C:\CarpetaProyectos\PowerBi Cine\Carpeta_Datos\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: da49b1ca-f771-4ae1-89d3-a8f75298f781
+	queryGroup: '0. Parámetros'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression Peliculas_Revision = ```
+		let
+		    Ruta = Text.TrimEnd(Carpeta_Datos, "\") & "\The_movies.xlsx",
+		
+		    Origen = Excel.Workbook(File.Contents(Ruta), null, true),
+		    Hoja = Origen{[Item="base_the_movies", Kind="Sheet"]}[Data],
+		
+		    // La primera fila contiene los encabezados originales.
+		    SinEncabezado = Table.Skip(Hoja, 1),
+		
+		    // Conservamos la fila original para poder revisar cada cambio.
+		    TextoOriginal = Table.RenameColumns(
+		        Table.SelectColumns(SinEncabezado, {"Column1"}),
+		        {{"Column1", "Registro_original"}}
+		    ),
+		
+		    ConFilaOrigen = Table.AddIndexColumn(
+		        TextoOriginal,
+		        "Fila_Excel",
+		        2,
+		        1,
+		        Int64.Type
+		    ),
+		
+		    // El archivo se guardó como UTF-8 pero se leyó como Windows-1252,
+		    // por eso aparece "PelÃ­cula" en lugar de "Película".
+		    // Se repara cada fila completa una sola vez, antes de separar campos.
+		    RepararTexto = (texto as nullable text) as nullable text =>
+		        if texto = null or Text.Remove(texto, {" ".."~"}) = "" then
+		            texto
+		        else
+		            let
+		                Convertir = (codificacion as number) as nullable text =>
+		                    try
+		                        Text.FromBinary(
+		                            Text.ToBinary(texto, codificacion),
+		                            65001
+		                        )
+		                    otherwise
+		                        null,
+		
+		                // Válida si no quedan caracteres de reemplazo
+		                // y el texto se acortó (dos bytes pasan a ser una letra).
+		                EsValido = (candidato as nullable text) as logical =>
+		                    candidato <> null
+		                        and not Text.Contains(candidato, Character.FromNumber(65533))
+		                        and Text.Length(candidato) < Text.Length(texto),
+		
+		                Con1252 = Convertir(1252),
+		                ConLatin1 = Convertir(28591)
+		            in
+		                if EsValido(Con1252) then Con1252
+		                else if EsValido(ConLatin1) then ConLatin1
+		                else texto,
+		
+		    SepararCSV = Splitter.SplitTextByDelimiter(
+		        ",",
+		        QuoteStyle.Csv
+		    ),
+		
+		    ConPartes = Table.AddColumn(
+		        ConFilaOrigen,
+		        "Partes",
+		        each
+		            if [Registro_original] = null then
+		                {}
+		            else
+		                SepararCSV(RepararTexto(Text.From([Registro_original]))),
+		        type list
+		    ),
+		
+		    ConCantidad = Table.AddColumn(
+		        ConPartes,
+		        "Campos_detectados",
+		        each List.Count([Partes]),
+		        Int64.Type
+		    ),
+		
+		    Nombres = {
+		        "Título",
+		        "Año de estreno",
+		        "Género",
+		        "Subgénero",
+		        "Presupuesto_usd",
+		        "Ingresos_usd",
+		        "Director",
+		        "Actores_principales",
+		        "Estudios cinematográficos",
+		        "Pósters"
+		    },
+		
+		    // En este archivo, los nueve campos finales siguen al título.
+		    // Si el título tiene comas, reunimos sus fragmentos.
+		    Reconstruccion = Table.AddColumn(
+		        ConCantidad,
+		        "Datos",
+		        each
+		            let
+		                Partes = [Partes],
+		                Cantidad = [Campos_detectados],
+		                Valores =
+		                    if Cantidad >= 10 then
+		                        {
+		                            Text.Combine(
+		                                List.FirstN(Partes, Cantidad - 9),
+		                                ","
+		                            )
+		                        }
+		                        & List.LastN(Partes, 9)
+		                    else
+		                        List.Repeat({null}, 10)
+		            in
+		                Record.FromList(Valores, Nombres),
+		        type record
+		    ),
+		
+		    Expandida = Table.ExpandRecordColumn(
+		        Reconstruccion,
+		        "Datos",
+		        Nombres,
+		        Nombres
+		    ),
+		
+		    SinListaAuxiliar = Table.RemoveColumns(
+		        Expandida,
+		        {"Partes"}
+		    ),
+		
+		    Tipos = Table.TransformColumnTypes(
+		        SinListaAuxiliar,
+		        {
+		            {"Título", type text},
+		            {"Año de estreno", Int64.Type},
+		            {"Género", type text},
+		            {"Subgénero", type text},
+		            {"Presupuesto_usd", Currency.Type},
+		            {"Ingresos_usd", Currency.Type},
+		            {"Director", type text},
+		            {"Actores_principales", type text},
+		            {"Estudios cinematográficos", type text},
+		            {"Pósters", type text}
+		        },
+		        "en-US"
+		    ),
+		
+		    ConEstado = Table.AddColumn(
+		        Tipos,
+		        "Estado_estructura",
+		        each
+		            if [Campos_detectados] < 10 then
+		                "REVISAR: faltan campos"
+		            else if [Campos_detectados] > 10 then
+		                "Título reconstruido: verificar"
+		            else
+		                "10 campos",
+		        type text
+		    ),
+		
+		    Resultado = Table.ReorderColumns(
+		        ConEstado,
+		        {"Fila_Excel"}
+		        & Nombres
+		        & {
+		            "Campos_detectados",
+		            "Estado_estructura",
+		            "Registro_original"
+		        }
+		    )
+		in
+		    Resultado
+		
+		```
+	lineageTag: 8c12f451-789b-4e05-ac11-ff46f7fdad61
+	queryGroup: '1. Fuentes'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Puntuaciones_Revision =
+		let
+		    Origen = Excel.Workbook(
+		        File.Contents(
+		            Text.TrimEnd(Carpeta_Datos, "\") & "\Puntajes_con_Calificaciones_y_Criticas.xlsx"
+		        ),
+		        null,
+		        true
+		    ),
+		
+		    Hoja = Origen{[Item="Sheet1", Kind="Sheet"]}[Data],
+		
+		    Encabezados = Table.PromoteHeaders(
+		        Hoja,
+		        [PromoteAllScalars=true]
+		    ),
+		
+		    Tipos = Table.TransformColumnTypes(
+		        Encabezados,
+		        {
+		            {"Título", type text},
+		            {"Año de estreno", Int64.Type},
+		            {"Calificacion_TMDb", type number},
+		            {"Total_Votos", Int64.Type},
+		            {"Popularidad", type number},
+		            {"Cantidad_Criticas", Int64.Type},
+		            {"Criticas_Destacadas", type text}
+		        }
+		    ),
+		
+		    ConTituloNormalizado = Table.AddColumn(
+		        Tipos,
+		        "Titulo_Normalizado",
+		        each
+		            if [Título] = null then
+		                null
+		            else
+		                Text.Upper(
+		                    Text.Trim(Text.Clean([Título])),
+		                    "es-ES"
+		                ),
+		        type text
+		    ),
+		
+		    ConClave = Table.AddColumn(
+		        ConTituloNormalizado,
+		        "Clave_Busqueda",
+		        each
+		            if [Titulo_Normalizado] = null
+		                or [Año de estreno] = null then
+		                null
+		            else
+		                [Titulo_Normalizado]
+		                & "|"
+		                & Text.From([Año de estreno], "en-US"),
+		        type text
+		    )
+		in
+		    ConClave
+	lineageTag: 9e9e6495-87ad-459f-b1a5-f9e856a77c39
+	queryGroup: '1. Fuentes'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Geografia_Revision =
+		let
+		    Origen = Excel.Workbook(
+		        File.Contents(
+		            Text.TrimEnd(Carpeta_Datos, "\") & "\Zona_Geografica_y_ROI.xlsx"
+		        ),
+		        null,
+		        true
+		    ),
+		
+		    Hoja = Origen{[Item="Sheet1", Kind="Sheet"]}[Data],
+		
+		    Encabezados = Table.PromoteHeaders(
+		        Hoja,
+		        [PromoteAllScalars = true]
+		    ),
+		
+		    Columnas = Table.SelectColumns(
+		        Encabezados,
+		        {
+		            "Título",
+		            "Año de estreno",
+		            "Paises_Produccion",
+		            "Codigos_Pais_ISO"
+		        }
+		    ),
+		
+		    Tipos = Table.TransformColumnTypes(
+		        Columnas,
+		        {
+		            {"Título", type text},
+		            {"Año de estreno", Int64.Type},
+		            {"Paises_Produccion", type text},
+		            {"Codigos_Pais_ISO", type text}
+		        }
+		    ),
+		
+		    ConTituloNormalizado = Table.AddColumn(
+		        Tipos,
+		        "Titulo_Normalizado",
+		        each
+		            if [Título] = null then null
+		            else Text.Upper(
+		                Text.Trim(Text.Clean([Título])),
+		                "es-ES"
+		            ),
+		        type text
+		    ),
+		
+		    ConClave = Table.AddColumn(
+		        ConTituloNormalizado,
+		        "Clave_Busqueda",
+		        each
+		            if [Titulo_Normalizado] = null
+		                or [Año de estreno] = null
+		            then null
+		            else [Titulo_Normalizado] & "|" &
+		                Text.From([Año de estreno], "en-US"),
+		        type text
+		    )
+		in
+		    ConClave
+	lineageTag: 6965f666-25cc-4e8d-b8b1-26d440935e80
+	queryGroup: '1. Fuentes'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Oscars_Preparados =
+		let
+		    Origen = Csv.Document(
+		        File.Contents(
+		            Text.TrimEnd(Carpeta_Datos, "\") & "\oscars_1927_a_presente.csv"
+		        ),
+		        [
+		            Delimiter = ";",
+		            Columns = 1,
+		            Encoding = 65001,
+		            QuoteStyle = QuoteStyle.Csv
+		        ]
+		    ),
+		
+		    Separadas = Table.SplitColumn(
+		        Origen,
+		        "Column1",
+		        Splitter.SplitTextByDelimiter(",", QuoteStyle.Csv),
+		        List.Transform({1..12}, each "Campo" & Text.From(_)),
+		        null,
+		        ExtraValues.Error
+		    ),
+		
+		    Encabezados = Table.PromoteHeaders(
+		        Separadas,
+		        [PromoteAllScalars = true]
+		    ),
+		
+		    Columnas = Table.SelectColumns(
+		        Encabezados,
+		        {
+		            "titulo",
+		            "anio_estreno",
+		            "anio_ceremonia_oscar",
+		            "director",
+		            "premios_oscars_ganados"
+		        }
+		    ),
+		
+		    Tipos = Table.TransformColumnTypes(
+		        Columnas,
+		        {
+		            {"titulo", type text},
+		            {"anio_estreno", Int64.Type},
+		            {"anio_ceremonia_oscar", Int64.Type},
+		            {"director", type text},
+		            {"premios_oscars_ganados", type text}
+		        }
+		    ),
+		
+		    Nombres = Table.RenameColumns(
+		        Tipos,
+		        {
+		            {"titulo", "Titulo_Oscar"},
+		            {"anio_estreno", "Anio_Estreno"},
+		            {"anio_ceremonia_oscar", "Anio_Ceremonia"},
+		            {"director", "Director_Oscar"},
+		            {"premios_oscars_ganados", "Premios_Originales"}
+		        }
+		    ),
+		
+		    ConFila = Table.AddIndexColumn(
+		        Nombres, "Fila_Origen_Oscar", 2, 1, Int64.Type
+		    ),
+		
+		    ConClave = Table.AddColumn(
+		    ConFila,
+		    "Clave_Busqueda",
+		    each
+		        let
+		            Titulo = if [Titulo_Oscar] = null then null
+		                else Text.Upper(
+		                    Text.Trim(Text.Clean([Titulo_Oscar])), "es-ES"
+		                ),
+		            Director = if [Director_Oscar] = null then null
+		                else Text.Upper(Text.Trim([Director_Oscar]), "es-ES"),
+		            Anio = [Anio_Estreno],
+		
+		            TituloUnion =
+		                if Titulo = "HUD EL MÁS SALVAJE ENTRE MIL"
+		                    and Anio = 1963
+		                    and Director = "MARTIN RITT"
+		                then "HUD, EL MÁS SALVAJE ENTRE MIL"
+		
+		                else if Titulo = "HELLO DOLLY!"
+		                    and Anio = 1969
+		                    and Director = "GENE KELLY"
+		                then "HELLO, DOLLY!"
+		
+		                else if Titulo = "NETWORK UN MUNDO IMPLACABLE"
+		                    and Anio = 1976
+		                    and Director = "SIDNEY LUMET"
+		                then "NETWORK, UN MUNDO IMPLACABLE"
+		
+		                else Titulo
+		        in
+		            if TituloUnion = null or Anio = null then null
+		            else TituloUnion & "|" & Text.From(Anio, "en-US"),
+		    type text
+		),
+		
+		    ConLista = Table.AddColumn(
+		        ConClave,
+		        "Premio_Original",
+		        each
+		            if [Premios_Originales] = null then
+		                {}
+		            else
+		                List.Select(
+		                    List.Transform(
+		                        Text.Split([Premios_Originales], "|"),
+		                        each Text.Trim(_)
+		                    ),
+		                    each _ <> ""
+		                ),
+		        type list
+		    ),
+		
+		    ConEstado = Table.AddColumn(
+		        ConLista,
+		        "Estado_Dato_Premio",
+		        each
+		            if List.IsEmpty([Premio_Original]) then
+		                "Sin detalle de premios"
+		            else
+		                "Con detalle de premios",
+		        type text
+		    ),
+		
+		    ConListaCompleta = Table.TransformColumns(
+		        ConEstado,
+		        {
+		            {
+		                "Premio_Original",
+		                each if List.IsEmpty(_) then {null} else _,
+		                type list
+		            }
+		        }
+		    ),
+		
+		    PremiosEnFilas = Table.ExpandListColumn(
+		        ConListaCompleta,
+		        "Premio_Original"
+		    ),
+		
+		    ConCategoria = Table.AddColumn(
+		    PremiosEnFilas,
+		    "Categoria_Original",
+		    each
+		        if [Premio_Original] = null then null
+		        else
+		            let
+		                Texto = Text.Trim([Premio_Original]),
+		                Recorrido = List.Accumulate(
+		                    Text.ToList(Texto),
+		                    [Nivel = 0, Posicion = 0, UltimaApertura = -1],
+		                    (Estado, Caracter) =>
+		                        [
+		                            Nivel =
+		                                Estado[Nivel]
+		                                + (if Caracter = "(" then 1
+		                                   else if Caracter = ")" then -1
+		                                   else 0),
+		                            Posicion = Estado[Posicion] + 1,
+		                            UltimaApertura =
+		                                if Caracter = "(" and Estado[Nivel] = 0
+		                                then Estado[Posicion]
+		                                else Estado[UltimaApertura]
+		                        ]
+		                )
+		            in
+		                if Recorrido[UltimaApertura] < 0 then Texto
+		                else Text.Trim(
+		                    Text.Start(Texto, Recorrido[UltimaApertura])
+		                ),
+		    type text
+		),
+		
+		    MapaPeliculas = let
+		    Columnas = Table.SelectColumns(
+		        Peliculas_Texto,
+		        {"Fila_Excel", "Clave_Busqueda"}
+		    ),
+		
+		    SinNulos = Table.SelectRows(
+		        Columnas,
+		        each [Clave_Busqueda] <> null
+		    ),
+		
+		    Agrupadas = Table.Group(
+		        SinNulos,
+		        {"Clave_Busqueda"},
+		        {
+		            {
+		                "Cantidad",
+		                each Table.RowCount(_),
+		                Int64.Type
+		            },
+		            {
+		                "Fila_Excel",
+		                each
+		                    if Table.RowCount(_) = 1 then
+		                        [Fila_Excel]{0}
+		                    else
+		                        null,
+		                Int64.Type
+		            }
+		        }
+		    ),
+		
+		    Unicas = Table.SelectRows(
+		        Agrupadas,
+		        each [Cantidad] = 1
+		    ),
+		
+		    Resultado = Table.RemoveColumns(
+		        Unicas,
+		        {"Cantidad"}
+		    )
+		in
+		    Resultado,
+		
+		    Combinadas = Table.NestedJoin(
+		        ConCategoria,
+		        {"Clave_Busqueda"},
+		        MapaPeliculas,
+		        {"Clave_Busqueda"},
+		        "Pelicula",
+		        JoinKind.LeftOuter
+		    ),
+		
+		    ConCantidad = Table.AddColumn(
+		        Combinadas,
+		        "Cantidad_Coincidencias",
+		        each Table.RowCount([Pelicula]),
+		        Int64.Type
+		    ),
+		
+		    ConId = Table.AddColumn(
+		        ConCantidad,
+		        "Id_Pelicula",
+		        each
+		            if [Cantidad_Coincidencias] = 1 then
+		                [Pelicula]{0}[Fila_Excel]
+		            else
+		                null,
+		        Int64.Type
+		    ),
+		
+		    ConEstadoUnion = Table.AddColumn(
+		    ConId,
+		    "Estado_Integracion_Oscar",
+		    each
+		        if [Cantidad_Coincidencias] = 0 then
+		            "Sin asignación"
+		        else if [Cantidad_Coincidencias] > 1 then
+		            "Coincidencia ambigua"
+		        else
+		            let
+		                ClaveOriginal =
+		                    Text.Upper(
+		                        Text.Trim(Text.Clean([Titulo_Oscar])), "es-ES"
+		                    )
+		                    & "|"
+		                    & Text.From([Anio_Estreno], "en-US")
+		            in
+		                if [Clave_Busqueda] = ClaveOriginal then
+		                    "Coincidencia exacta de clave"
+		                else
+		                    "Equivalencia de título revisada",
+		    type text
+		),
+		
+		    Resultado = Table.RemoveColumns(
+		        ConEstadoUnion,
+		        {"Pelicula"}
+		    )
+		in
+		    Resultado
+	lineageTag: 45e6cc04-74ff-492d-8c5c-7315c40577b7
+	queryGroup: '1. Fuentes'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression IPC_Anual_USA =
+		let
+		    Origen = Csv.Document(
+		        Web.Contents(
+		            "https://fred.stlouisfed.org",
+		            [
+		                RelativePath = "graph/fredgraph.csv",
+		                Query = [id = "CPIAUCNS"]
+		            ]
+		        ),
+		        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+		    ),
+		
+		    Encabezados = Table.PromoteHeaders(
+		        Origen,
+		        [PromoteAllScalars = true]
+		    ),
+		
+		    Numeros = Table.TransformColumns(
+		        Encabezados,
+		        {
+		            {
+		                "CPIAUCNS",
+		                each
+		                    if _ = null or _ = "" or _ = "."
+		                    then null
+		                    else Number.FromText(_, "en-US"),
+		                type number
+		            }
+		        }
+		    ),
+		
+		    Fechas = Table.TransformColumnTypes(
+		        Numeros,
+		        {{"observation_date", type date}},
+		        "en-US"
+		    ),
+		
+		    ConAnio = Table.AddColumn(
+		        Fechas,
+		        "Anio",
+		        each Date.Year([observation_date]),
+		        Int64.Type
+		    ),
+		
+		    Periodo = Table.SelectRows(ConAnio, each [Anio] <= 2025),
+		
+		    Anuales = Table.Group(
+		        Periodo,
+		        {"Anio"},
+		        {
+		            {"IPC_Anual", each List.Average([CPIAUCNS]), type number},
+		            {"Meses", each List.NonNullCount([CPIAUCNS]), Int64.Type}
+		        }
+		    ),
+		
+		    Validados = Table.AddColumn(
+		        Anuales,
+		        "IPC_Validado",
+		        each
+		            if [Meses] = 12 or ([Anio] = 2025 and [Meses] = 11)
+		            then [IPC_Anual]
+		            else error "Revisar cobertura mensual del IPC.",
+		        type number
+		    ),
+		
+		    IPCBase = Validados{[Anio = 2025]}[IPC_Validado],
+		
+		    ConFactor = Table.AddColumn(
+		        Validados,
+		        "Factor_2025",
+		        each IPCBase / [IPC_Validado],
+		        type number
+		    ),
+		
+		    Resultado = Table.SelectColumns(
+		        ConFactor,
+		        {"Anio", "IPC_Anual", "Meses", "Factor_2025"}
+		    )
+		in
+		    Resultado
+	lineageTag: 2b6c6474-553d-4736-a6d5-d4ed0e6372ca
+	queryGroup: '1. Fuentes'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Peliculas_Texto = ```
+		let
+		    // Los acentos ya se reparan en Peliculas_Revision, fila por fila.
+		    Origen = Peliculas_Revision,
+		
+		    ConTituloNormalizado = Table.AddColumn(
+		        Origen,
+		        "Titulo_Normalizado",
+		        each
+		            if [Título] = null then
+		                null
+		            else
+		                Text.Upper(Text.Trim(Text.Clean([Título])), "es-ES"),
+		        type text
+		    ),
+		
+		    ConClave = Table.AddColumn(
+		        ConTituloNormalizado,
+		        "Clave_Busqueda",
+		        each
+		            if [Titulo_Normalizado] = null or [Año de estreno] = null then
+		                null
+		            else
+		                [Titulo_Normalizado]
+		                & "|"
+		                & Text.From([Año de estreno], "en-US"),
+		        type text
+		    )
+		in
+		    ConClave
+		
+		```
+	lineageTag: 260baaff-9c05-4b94-b846-f6052769dbe7
+	queryGroup: '2. Preparación'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Revision_Coincidencias =
+		let
+		    Origen = Peliculas_Texto,
+		
+		    Agrupadas = Table.Group(
+		        Origen,
+		        {"Clave_Busqueda"},
+		        {
+		            {"Cantidad", each Table.RowCount(_), Int64.Type},
+		            {"Detalle", each _}
+		        }
+		    ),
+		
+		    Repetidas = Table.SelectRows(
+		        Agrupadas,
+		        each [Cantidad] > 1
+		    ),
+		
+		    Resultado = Table.ExpandTableColumn(
+		        Repetidas,
+		        "Detalle",
+		        {
+		            "Fila_Excel",
+		            "Título",
+		            "Año de estreno",
+		            "Director",
+		            "Presupuesto_usd",
+		            "Ingresos_usd"
+		        }
+		    )
+		in
+		    Resultado
+	lineageTag: e4825271-538f-4a55-829b-b4dfa7101de3
+	queryGroup: '2. Preparación'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Peliculas_Preparadas =
+		let
+		    Origen = Peliculas_Texto,
+		
+		    ClavesRepetidas = List.Buffer(
+		        List.Distinct(
+		            List.RemoveNulls(
+		                Revision_Coincidencias[Clave_Busqueda]
+		            )
+		        )
+		    ),
+		
+		    ConEstado = Table.AddColumn(
+		        Origen,
+		        "Estado_Coincidencia",
+		        each
+		            if [Clave_Busqueda] = null then
+		                "Sin clave"
+		            else if List.Contains(
+		                ClavesRepetidas,
+		                [Clave_Busqueda]
+		            ) then
+		                "Revisar identidad"
+		            else
+		                "Clave no repetida",
+		        type text
+		    )
+		in
+		    ConEstado
+	lineageTag: ca5960cb-37c9-407a-b30e-766b5a7e897f
+	queryGroup: '2. Preparación'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Puntuaciones_Agrupadas =
+		let
+		    Origen = Puntuaciones_Revision,
+		
+		    CamposPuntuacion = {
+		        "Calificacion_TMDb",
+		        "Total_Votos",
+		        "Popularidad",
+		        "Cantidad_Criticas",
+		        "Criticas_Destacadas"
+		    },
+		
+		    Agrupadas = Table.Group(
+		        Origen,
+		        {"Clave_Busqueda"},
+		        {
+		            {
+		                "Filas_origen",
+		                each Table.RowCount(_),
+		                Int64.Type
+		            },
+		            {
+		                "Versiones",
+		                each Table.Distinct(
+		                    Table.SelectColumns(_, CamposPuntuacion)
+		                )
+		            }
+		        }
+		    ),
+		
+		    ConCantidad = Table.AddColumn(
+		        Agrupadas,
+		        "Cantidad_versiones",
+		        each Table.RowCount([Versiones]),
+		        Int64.Type
+		    ),
+		
+		    ConEstado = Table.AddColumn(
+		        ConCantidad,
+		        "Estado_Puntuacion",
+		        each
+		            if [Clave_Busqueda] = null then
+		                "Sin clave"
+		            else if [Cantidad_versiones] = 1 then
+		                "Una versión"
+		            else
+		                "Revisar diferencias",
+		        type text
+		    )
+		in
+		    ConEstado
+	lineageTag: 274d4c94-cf56-4b59-82bc-45ed24d5e49b
+	queryGroup: '2. Preparación'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Puntuaciones_Preparadas =
+		let
+		    Origen = Puntuaciones_Agrupadas,
+		
+		    Campos = {
+		        "Calificacion_TMDb",
+		        "Total_Votos",
+		        "Popularidad",
+		        "Cantidad_Criticas",
+		        "Criticas_Destacadas"
+		    },
+		
+		    RegistroVacio = Record.FromList(
+		        List.Repeat({null}, List.Count(Campos)),
+		        Campos
+		    ),
+		
+		    ConDatos = Table.AddColumn(
+		        Origen,
+		        "Datos_Puntuacion",
+		        each
+		            if [Estado_Puntuacion] = "Una versión"
+		                and [Cantidad_versiones] = 1 then
+		                [Versiones]{0}
+		            else
+		                RegistroVacio,
+		        type record
+		    ),
+		
+		    SinTablaAuxiliar = Table.RemoveColumns(
+		        ConDatos,
+		        {"Versiones"}
+		    ),
+		
+		    Expandida = Table.ExpandRecordColumn(
+		        SinTablaAuxiliar,
+		        "Datos_Puntuacion",
+		        Campos,
+		        Campos
+		    ),
+		
+		    Tipos = Table.TransformColumnTypes(
+		        Expandida,
+		        {
+		            {"Calificacion_TMDb", type number},
+		            {"Total_Votos", Int64.Type},
+		            {"Popularidad", type number},
+		            {"Cantidad_Criticas", Int64.Type},
+		            {"Criticas_Destacadas", type text}
+		        }
+		    )
+		in
+		    Tipos
+	lineageTag: e131b130-3fcb-4cdd-83f2-3ba0dace6149
+	queryGroup: '2. Preparación'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Puntuaciones_Alternativas =
+		let
+		    Origen = Puntuaciones_Revision,
+		
+		    // Misma clave, pero cambiando comas y guiones por espacios.
+		    ConClaveAlternativa = Table.AddColumn(
+		        Origen,
+		        "Clave_Alternativa",
+		        each
+		            if [Título] = null or [Año de estreno] = null then
+		                null
+		            else
+		                let
+		                    Titulo = Text.Upper(Text.Trim([Título]), "es-ES"),
+		                    Separadores = Text.Replace(
+		                        Text.Replace(Titulo, ",", " "),
+		                        "-", " "
+		                    ),
+		                    SinEspaciosExtra = Text.Combine(
+		                        List.Select(Text.Split(Separadores, " "), each _ <> ""),
+		                        " "
+		                    )
+		                in
+		                    SinEspaciosExtra & "|" &
+		                    Text.From([Año de estreno], "en-US"),
+		        type text
+		    )
+		in
+		    ConClaveAlternativa
+	lineageTag: 9a74a8cc-3f71-43c0-8976-951e8102d4c9
+	queryGroup: '2. Preparación'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Mapa_Puntuaciones_Alternativas =
+		let
+		    Origen = Puntuaciones_Alternativas,
+		
+		    Claves = Table.SelectColumns(
+		        Origen,
+		        {"Clave_Alternativa", "Clave_Busqueda"}
+		    ),
+		
+		    SinNulos = Table.SelectRows(
+		        Claves,
+		        each [Clave_Alternativa] <> null
+		            and [Clave_Busqueda] <> null
+		    ),
+		
+		    ParesUnicos = Table.Distinct(SinNulos),
+		
+		    Agrupadas = Table.Group(
+		        ParesUnicos,
+		        {"Clave_Alternativa"},
+		        {
+		            {"Cantidad_Claves", each Table.RowCount(_), Int64.Type},
+		            {"Detalle", each _, type table}
+		        }
+		    ),
+		
+		    SinAmbiguedad = Table.SelectRows(
+		        Agrupadas,
+		        each [Cantidad_Claves] = 1
+		    ),
+		
+		    Expandida = Table.ExpandTableColumn(
+		        SinAmbiguedad,
+		        "Detalle",
+		        {"Clave_Busqueda"},
+		        {"Clave_Puntuacion_Original"}
+		    ),
+		
+		    Resultado = Table.RemoveColumns(
+		        Expandida,
+		        {"Cantidad_Claves"}
+		    )
+		in
+		    Resultado
+	lineageTag: 6a96ca64-ad09-4aef-83f2-619094863e30
+	queryGroup: '2. Preparación'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Geografia_Preparada =
+		let
+		    Origen = Geografia_Revision,
+		
+		    Columnas = Table.SelectColumns(
+		        Origen,
+		        {
+		            "Clave_Busqueda",
+		            "Paises_Produccion",
+		            "Codigos_Pais_ISO"
+		        }
+		    ),
+		
+		    SinDuplicados = Table.Distinct(Columnas)
+		in
+		    SinDuplicados
+	lineageTag: 0cf28788-b80a-4e40-b8ce-c7b2230207d0
+	queryGroup: '2. Preparación'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Peliculas_Integradas =
+		let
+		    Origen = Peliculas_Preparadas,
+		
+		    CamposPuntuacion = {
+		        "Estado_Puntuacion",
+		        "Calificacion_TMDb",
+		        "Total_Votos",
+		        "Popularidad",
+		        "Cantidad_Criticas",
+		        "Criticas_Destacadas"
+		    },
+		
+		    // Solo se unen las películas cuya clave no está repetida.
+		    ConClaveUnion = Table.AddColumn(
+		        Origen,
+		        "Clave_Union_Puntuaciones",
+		        each
+		            if [Estado_Coincidencia] = "Clave no repetida"
+		            then [Clave_Busqueda]
+		            else null,
+		        type text
+		    ),
+		
+		    Combinadas = Table.NestedJoin(
+		        ConClaveUnion,
+		        {"Clave_Union_Puntuaciones"},
+		        Puntuaciones_Preparadas,
+		        {"Clave_Busqueda"},
+		        "Puntuaciones_Preparadas",
+		        JoinKind.LeftOuter
+		    ),
+		
+		    Expandidas = Table.ExpandTableColumn(
+		        Combinadas,
+		        "Puntuaciones_Preparadas",
+		        CamposPuntuacion,
+		        CamposPuntuacion
+		    ),
+		
+		    ConEstado = Table.AddColumn(
+		        Expandidas,
+		        "Estado_Integracion_Puntuaciones",
+		        each
+		            if [Estado_Coincidencia] = "Revisar identidad" then
+		                "Identidad pendiente"
+		            else if [Estado_Puntuacion] = null then
+		                "Sin coincidencia"
+		            else if [Estado_Puntuacion] = "Revisar diferencias" then
+		                "Puntuaciones en conflicto"
+		            else if [Calificacion_TMDb] = null then
+		                "Sin calificación disponible"
+		            else if [Total_Votos] = null or [Total_Votos] = 0 then
+		                "Sin votos disponibles"
+		            else
+		                "Con calificación y votos",
+		        type text
+		    )
+		in
+		    ConEstado
+	lineageTag: 25ca2f84-83fa-4232-aacd-db90a0f2c697
+	queryGroup: '3. Integración'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Revision_Sin_Puntuacion =
+		let
+		    Origen = Peliculas_Integradas,
+		
+		    SinCoincidencia = Table.SelectRows(
+		        Origen,
+		        each [Estado_Integracion_Puntuaciones] = "Sin coincidencia"
+		    ),
+		
+		    Columnas = Table.SelectColumns(
+		        SinCoincidencia,
+		        {"Fila_Excel", "Título", "Año de estreno", "Director", "Clave_Busqueda"}
+		    ),
+		
+		    // Misma clave, pero cambiando comas y guiones por espacios.
+		    ConClaveAlternativa = Table.AddColumn(
+		        Columnas,
+		        "Clave_Alternativa",
+		        each
+		            let
+		                Titulo = Text.Upper(Text.Trim([Título]), "es-ES"),
+		                Separadores = Text.Replace(
+		                    Text.Replace(Titulo, ",", " "),
+		                    "-", " "
+		                ),
+		                SinEspaciosExtra = Text.Combine(
+		                    List.Select(Text.Split(Separadores, " "), each _ <> ""),
+		                    " "
+		                )
+		            in
+		                SinEspaciosExtra & "|" &
+		                Text.From([Año de estreno], "en-US"),
+		        type text
+		    )
+		in
+		    ConClaveAlternativa
+	lineageTag: fa220467-d05e-4c73-a684-081a94c38491
+	queryGroup: '3. Integración'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Revision_Candidatas_Puntuaciones =
+		let
+		    Origen = Revision_Sin_Puntuacion,
+		
+		    Combinadas = Table.NestedJoin(
+		        Origen,
+		        {"Clave_Alternativa"},
+		        Mapa_Puntuaciones_Alternativas,
+		        {"Clave_Alternativa"},
+		        "Mapa_Puntuaciones_Alternativas",
+		        JoinKind.LeftOuter
+		    ),
+		
+		    Expandidas = Table.ExpandTableColumn(
+		        Combinadas,
+		        "Mapa_Puntuaciones_Alternativas",
+		        {"Clave_Puntuacion_Original"},
+		        {"Clave_Puntuacion_Original"}
+		    ),
+		
+		    ConEstado = Table.AddColumn(
+		        Expandidas,
+		        "Estado_Candidata",
+		        each
+		            if [Clave_Puntuacion_Original] = null then
+		                "Sin candidata"
+		            else
+		                "Con candidata",
+		        type text
+		    )
+		in
+		    ConEstado
+	lineageTag: 1cd27641-c318-402c-870d-4c00c40a6d01
+	queryGroup: '3. Integración'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Puntuaciones_Recuperadas =
+		let
+		    Origen = Revision_Candidatas_Puntuaciones,
+		
+		    ConCandidata = Table.SelectRows(
+		        Origen,
+		        each [Estado_Candidata] = "Con candidata"
+		    ),
+		
+		    Combinadas = Table.NestedJoin(
+		        ConCandidata,
+		        {"Clave_Puntuacion_Original"},
+		        Puntuaciones_Preparadas,
+		        {"Clave_Busqueda"},
+		        "Puntuaciones_Preparadas",
+		        JoinKind.LeftOuter
+		    ),
+		
+		    CamposPuntuacion = {
+		        "Estado_Puntuacion",
+		        "Calificacion_TMDb",
+		        "Total_Votos",
+		        "Popularidad",
+		        "Cantidad_Criticas",
+		        "Criticas_Destacadas"
+		    },
+		
+		    Expandidas = Table.ExpandTableColumn(
+		        Combinadas,
+		        "Puntuaciones_Preparadas",
+		        CamposPuntuacion,
+		        CamposPuntuacion
+		    )
+		in
+		    Expandidas
+	lineageTag: 2f7cb801-08ae-4432-8404-47f0f938dd98
+	queryGroup: '3. Integración'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Peliculas_Con_Puntuaciones =
+		let
+		    Origen = Peliculas_Integradas,
+		
+		    CamposPuntuacion = {
+		        "Estado_Puntuacion",
+		        "Calificacion_TMDb",
+		        "Total_Votos",
+		        "Popularidad",
+		        "Cantidad_Criticas",
+		        "Criticas_Destacadas"
+		    },
+		
+		    // Las puntuaciones recuperadas por clave alternativa llevan prefijo
+		    // para no pisar las que vinieron por coincidencia exacta.
+		    Prefijo = "Puntuaciones_Recuperadas.",
+		    CamposRecuperados = {"Clave_Puntuacion_Original"} & CamposPuntuacion,
+		
+		    Combinadas = Table.NestedJoin(
+		        Origen,
+		        {"Fila_Excel"},
+		        Puntuaciones_Recuperadas,
+		        {"Fila_Excel"},
+		        "Puntuaciones_Recuperadas",
+		        JoinKind.LeftOuter
+		    ),
+		
+		    Expandidas = Table.ExpandTableColumn(
+		        Combinadas,
+		        "Puntuaciones_Recuperadas",
+		        CamposRecuperados,
+		        List.Transform(CamposRecuperados, each Prefijo & _)
+		    ),
+		
+		    ConMetodo = Table.AddColumn(
+		        Expandidas,
+		        "Metodo_Coincidencia_Puntuaciones",
+		        each
+		            if [Estado_Coincidencia] = "Revisar identidad" then
+		                "Identidad pendiente"
+		            else if [Estado_Puntuacion] <> null then
+		                "Coincidencia exacta de clave"
+		            else if [#"Puntuaciones_Recuperadas.Clave_Puntuacion_Original"] <> null then
+		                "Normalización de separadores"
+		            else
+		                "Sin coincidencia",
+		        type text
+		    ),
+		
+		    // Elegimos la versión final de cada campo según el método de coincidencia.
+		    ConDatosFinales = Table.AddColumn(
+		        ConMetodo,
+		        "Datos_Puntuacion_Final",
+		        (Fila) =>
+		            if Fila[Metodo_Coincidencia_Puntuaciones]
+		                = "Normalización de separadores"
+		            then
+		                Record.FromList(
+		                    List.Transform(
+		                        CamposPuntuacion,
+		                        (Campo) => Record.Field(Fila, Prefijo & Campo)
+		                    ),
+		                    CamposPuntuacion
+		                )
+		            else
+		                Record.SelectFields(Fila, CamposPuntuacion),
+		        type record
+		    ),
+		
+		    // Quitamos las versiones anteriores y el estado previo,
+		    // que se vuelve a calcular con los datos finales.
+		    SinVersionesAnteriores = Table.RemoveColumns(
+		        ConDatosFinales,
+		        CamposPuntuacion
+		            & List.Transform(CamposPuntuacion, each Prefijo & _)
+		            & {"Estado_Integracion_Puntuaciones"}
+		    ),
+		
+		    DatosFinales = Table.ExpandRecordColumn(
+		        SinVersionesAnteriores,
+		        "Datos_Puntuacion_Final",
+		        CamposPuntuacion,
+		        CamposPuntuacion
+		    ),
+		
+		    ConEstado = Table.AddColumn(
+		        DatosFinales,
+		        "Estado_Integracion_Puntuaciones",
+		        each
+		            if [Metodo_Coincidencia_Puntuaciones] = "Identidad pendiente" then
+		                "Identidad pendiente"
+		            else if [Estado_Puntuacion] = null then
+		                "Sin coincidencia"
+		            else if [Estado_Puntuacion] = "Revisar diferencias" then
+		                "Puntuaciones en conflicto"
+		            else if [Calificacion_TMDb] = null then
+		                "Sin calificación disponible"
+		            else if [Total_Votos] = null or [Total_Votos] = 0 then
+		                "Sin votos disponibles"
+		            else
+		                "Con calificación y votos",
+		        type text
+		    ),
+		
+		    Tipos = Table.TransformColumnTypes(
+		        ConEstado,
+		        {
+		            {"Calificacion_TMDb", type number},
+		            {"Popularidad", type number},
+		            {"Total_Votos", Int64.Type},
+		            {"Cantidad_Criticas", Int64.Type},
+		            {"Criticas_Destacadas", type text},
+		            {"Estado_Puntuacion", type text}
+		        }
+		    ),
+		
+		    Resultado = Table.SelectColumns(
+		        Tipos,
+		        {
+		            "Fila_Excel",
+		            "Título",
+		            "Año de estreno",
+		            "Género",
+		            "Subgénero",
+		            "Presupuesto_usd",
+		            "Ingresos_usd",
+		            "Director",
+		            "Actores_principales",
+		            "Estudios cinematográficos",
+		            "Pósters",
+		            "Campos_detectados",
+		            "Estado_estructura",
+		            "Registro_original",
+		            "Titulo_Normalizado",
+		            "Clave_Busqueda",
+		            "Calificacion_TMDb",
+		            "Total_Votos",
+		            "Estado_Coincidencia",
+		            "Clave_Union_Puntuaciones",
+		            "Puntuaciones_Recuperadas.Clave_Puntuacion_Original",
+		            "Metodo_Coincidencia_Puntuaciones",
+		            "Estado_Puntuacion",
+		            "Popularidad",
+		            "Cantidad_Criticas",
+		            "Criticas_Destacadas",
+		            "Estado_Integracion_Puntuaciones"
+		        }
+		    )
+		in
+		    Resultado
+	lineageTag: ea138fde-fe2a-44c4-8774-e68abcb1f238
+	queryGroup: '3. Integración'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Peliculas_Con_Geografia =
+		let
+		    Origen = Peliculas_Con_Puntuaciones,
+		
+		    ConClave = Table.AddColumn(
+		        Origen,
+		        "Clave_Union_Geografia",
+		        each
+		            if [Estado_Coincidencia] = "Clave no repetida"
+		            then [Clave_Busqueda]
+		            else null,
+		        type text
+		    ),
+		
+		    Combinadas = Table.NestedJoin(
+		        ConClave,
+		        {"Clave_Union_Geografia"},
+		        Geografia_Preparada,
+		        {"Clave_Busqueda"},
+		        "Datos_Geografia",
+		        JoinKind.LeftOuter
+		    ),
+		
+		    Expandidas = Table.ExpandTableColumn(
+		        Combinadas,
+		        "Datos_Geografia",
+		        {
+		            "Clave_Busqueda",
+		            "Paises_Produccion",
+		            "Codigos_Pais_ISO"
+		        },
+		        {
+		            "Clave_Geografia_Encontrada",
+		            "Paises_Produccion",
+		            "Codigos_Pais_ISO"
+		        }
+		    ),
+		
+		    ConEstado = Table.AddColumn(
+		        Expandidas,
+		        "Estado_Integracion_Geografia",
+		        each
+		            if [Estado_Coincidencia] = "Revisar identidad"
+		            then "Identidad pendiente"
+		            else if [Clave_Union_Geografia] = null
+		            then "Sin clave"
+		            else if [Clave_Geografia_Encontrada] = null
+		            then "Sin coincidencia"
+		            else "Coincidencia exacta de clave",
+		        type text
+		    )
+		in
+		    ConEstado
+	lineageTag: 18fbeb43-cd1d-42b9-b0fe-f8750bb8f639
+	queryGroup: '3. Integración'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Peliculas_Geografia_Final =
+		let
+		    Origen = Peliculas_Con_Geografia,
+		
+		    Campos = {
+		        "Clave_Geografia_Encontrada",
+		        "Paises_Produccion",
+		        "Codigos_Pais_ISO",
+		        "Estado_Integracion_Geografia"
+		    },
+		
+		    ConClaveAlternativa = Table.AddColumn(
+		        Origen,
+		        "_ClaveAlternativaGeo",
+		        each
+		            if [Estado_Integracion_Geografia] = "Sin coincidencia"
+		                and [Estado_Coincidencia] = "Clave no repetida"
+		                and [Metodo_Coincidencia_Puntuaciones]
+		                    = "Normalización de separadores"
+		            then
+		                [#"Puntuaciones_Recuperadas.Clave_Puntuacion_Original"]
+		            else
+		                null,
+		        type text
+		    ),
+		
+		    Combinadas = Table.NestedJoin(
+		        ConClaveAlternativa,
+		        {"_ClaveAlternativaGeo"},
+		        Geografia_Preparada,
+		        {"Clave_Busqueda"},
+		        "_GeografiaAlternativa",
+		        JoinKind.LeftOuter
+		    ),
+		
+		    Expandidas = Table.ExpandTableColumn(
+		        Combinadas,
+		        "_GeografiaAlternativa",
+		        {
+		            "Clave_Busqueda",
+		            "Paises_Produccion",
+		            "Codigos_Pais_ISO"
+		        },
+		        {
+		            "_ClaveRecuperada",
+		            "_PaisesRecuperados",
+		            "_CodigosRecuperados"
+		        }
+		    ),
+		
+		    ConDatosFinales = Table.AddColumn(
+		        Expandidas,
+		        "_DatosFinales",
+		        each
+		            if [_ClaveRecuperada] <> null then
+		                [
+		                    Clave_Geografia_Encontrada =
+		                        [_ClaveRecuperada],
+		                    Paises_Produccion =
+		                        [_PaisesRecuperados],
+		                    Codigos_Pais_ISO =
+		                        [_CodigosRecuperados],
+		                    Estado_Integracion_Geografia =
+		                        "Normalización de separadores"
+		                ]
+		            else
+		                Record.SelectFields(_, Campos),
+		        type record
+		    ),
+		
+		    SinAuxiliares = Table.RemoveColumns(
+		        ConDatosFinales,
+		        Campos & {
+		            "_ClaveAlternativaGeo",
+		            "_ClaveRecuperada",
+		            "_PaisesRecuperados",
+		            "_CodigosRecuperados"
+		        }
+		    ),
+		
+		    Resultado = Table.ExpandRecordColumn(
+		        SinAuxiliares,
+		        "_DatosFinales",
+		        Campos,
+		        Campos
+		    ),
+		
+		    Tipos = Table.TransformColumnTypes(
+		        Resultado,
+		        List.Transform(Campos, each {_, type text})
+		    ),
+		    // Lista de países limpia, para armar el puente película-país.
+		    ConListaPaises = Table.AddColumn(
+		        Tipos,
+		        "Lista_Paises_Produccion",
+		        each
+		            let
+		                Texto = [Paises_Produccion],
+		                Partes =
+		                    if Texto = null then {}
+		                    else Text.Split(Texto, ","),
+		                Limpias = List.Transform(
+		                    Partes,
+		                    each Text.Upper(Text.Trim(Text.Clean(_)), "es-ES")
+		                ),
+		                Validas = List.Select(
+		                    Limpias,
+		                    each not List.Contains(
+		                        {"", "N/A", "NO ENCONTRADA", "NO ENCONTRADA EN TMDB"},
+		                        _
+		                    )
+		                )
+		            in
+		                List.Distinct(Validas),
+		        type list
+		    ),
+		
+		    ConEstadoPais = Table.AddColumn(
+		        ConListaPaises,
+		        "Estado_Dato_Pais",
+		        each
+		            if List.IsEmpty([Lista_Paises_Produccion])
+		            then "Sin país informado"
+		            else "Con país informado",
+		        type text
+		    )
+		in
+		    ConEstadoPais
+	lineageTag: d0a6860d-68e5-4c75-87d5-db34cb05ff1a
+	queryGroup: '3. Integración'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Control_Filas =
+		let
+		    Origen = Table.RowCount(Peliculas_Geografia_Final)
+		in
+		    Origen
+	lineageTag: 81897491-ea8c-46d8-a534-2ad9f1915fe3
+	queryGroup: '4. Controles'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Number
+
+expression Control_Calidad =
+		let
+		    Datos = Peliculas_Texto,
+		
+		    Resumen = #table(
+		        type table [Control = text, Cantidad = Int64.Type],
+		        {
+		            {
+		                "Total de filas",
+		                Table.RowCount(Datos)
+		            },
+		            {
+		                "Filas con 10 campos originales",
+		                Table.RowCount(
+		                    Table.SelectRows(
+		                        Datos,
+		                        each [Campos_detectados] = 10
+		                    )
+		                )
+		            },
+		            {
+		                "Filas con título reconstruido",
+		                Table.RowCount(
+		                    Table.SelectRows(
+		                        Datos,
+		                        each [Campos_detectados] > 10
+		                    )
+		                )
+		            },
+		            {
+		                "Filas con campos insuficientes",
+		                Table.RowCount(
+		                    Table.SelectRows(
+		                        Datos,
+		                        each [Campos_detectados] < 10
+		                    )
+		                )
+		            },
+		            {
+		                "Filas con errores en alguna columna",
+		                Table.RowCount(
+		                    Table.SelectRowsWithErrors(Datos)
+		                )
+		            }
+		        }
+		    )
+		in
+		    Resumen
+	lineageTag: 3571b74b-18a5-4158-90c3-6beb1e02cd39
+	queryGroup: '4. Controles'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Control_Integracion_Puntuaciones =
+		let
+		    Origen = Peliculas_Con_Puntuaciones,
+		
+		    Resumen = Table.Group(
+		        Origen,
+		        {"Estado_Integracion_Puntuaciones"},
+		        {
+		            {
+		                "Cantidad_Peliculas",
+		                each Table.RowCount(_),
+		                Int64.Type
+		            }
+		        }
+		    )
+		in
+		    Resumen
+	lineageTag: dafe3736-a291-4cd7-8cc1-050023ddfef3
+	queryGroup: '4. Controles'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Control_Claves_Alternativas =
+		let
+		    Origen = Puntuaciones_Alternativas,
+		
+		    ConClave = Table.SelectRows(
+		        Origen,
+		        each [Clave_Alternativa] <> null
+		    ),
+		
+		    Agrupadas = Table.Group(
+		        ConClave,
+		        {"Clave_Alternativa"},
+		        {
+		            {
+		                "Cantidad_Claves_Originales",
+		                each List.Count(List.Distinct([Clave_Busqueda])),
+		                Int64.Type
+		            },
+		            {
+		                "Claves_Originales",
+		                each Text.Combine(
+		                    List.Distinct([Clave_Busqueda]),
+		                    " / "
+		                ),
+		                type text
+		            }
+		        }
+		    ),
+		
+		    Ambiguas = Table.SelectRows(
+		        Agrupadas,
+		        each [Cantidad_Claves_Originales] > 1
+		    )
+		in
+		    Ambiguas
+	lineageTag: daba6baf-8d2b-43bd-a204-680683086a2a
+	queryGroup: '4. Controles'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Control_Candidatas =
+		let
+		    Origen = Revision_Candidatas_Puntuaciones,
+		
+		    Resumen = Table.Group(
+		        Origen,
+		        {"Estado_Candidata"},
+		        {
+		            {
+		                "Cantidad_Peliculas",
+		                each Table.RowCount(_),
+		                Int64.Type
+		            }
+		        }
+		    )
+		in
+		    Resumen
+	lineageTag: 8181e728-89f5-4f63-b54a-4d3c7e05f4ed
+	queryGroup: '4. Controles'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Control_Asignaciones_Puntuaciones =
+		let
+		    Exactas = Table.SelectRows(
+		        Peliculas_Integradas,
+		        each [Estado_Puntuacion] <> null
+		            and [Clave_Union_Puntuaciones] <> null
+		    ),
+		
+		    ClavesExactas = Table.RenameColumns(
+		        Table.SelectColumns(
+		            Exactas,
+		            {"Fila_Excel", "Clave_Union_Puntuaciones"}
+		        ),
+		        {{"Clave_Union_Puntuaciones", "Clave_Puntuacion"}}
+		    ),
+		
+		    Candidatas = Table.SelectRows(
+		        Revision_Candidatas_Puntuaciones,
+		        each [Clave_Puntuacion_Original] <> null
+		    ),
+		
+		    ClavesCandidatas = Table.RenameColumns(
+		        Table.SelectColumns(
+		            Candidatas,
+		            {"Fila_Excel", "Clave_Puntuacion_Original"}
+		        ),
+		        {{"Clave_Puntuacion_Original", "Clave_Puntuacion"}}
+		    ),
+		
+		    Asignaciones = Table.Combine(
+		        {ClavesExactas, ClavesCandidatas}
+		    ),
+		
+		    Agrupadas = Table.Group(
+		        Asignaciones,
+		        {"Clave_Puntuacion"},
+		        {
+		            {
+		                "Cantidad_Filas_Base",
+		                each List.Count(List.Distinct([Fila_Excel])),
+		                Int64.Type
+		            },
+		            {
+		                "Filas_Excel",
+		                each Text.Combine(
+		                    List.Transform(
+		                        List.Distinct([Fila_Excel]),
+		                        each Text.From(_)
+		                    ),
+		                    ", "
+		                ),
+		                type text
+		            }
+		        }
+		    ),
+		
+		    Compartidas = Table.SelectRows(
+		        Agrupadas,
+		        each [Cantidad_Filas_Base] > 1
+		    )
+		in
+		    Compartidas
+	lineageTag: 91335ffc-2fab-4e81-bc96-82e668050f0e
+	queryGroup: '4. Controles'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Control_Geografia =
+		let
+		    Origen = Table.SelectColumns(
+		        Geografia_Revision,
+		        {
+		            "Clave_Busqueda",
+		            "Paises_Produccion",
+		            "Codigos_Pais_ISO"
+		        }
+		    ),
+		
+		    ConClave = Table.SelectRows(
+		        Origen,
+		        each [Clave_Busqueda] <> null
+		            and [Clave_Busqueda] <> ""
+		    ),
+		
+		    Agrupadas = Table.Group(
+		        ConClave,
+		        {"Clave_Busqueda"},
+		        {
+		            {
+		                "Filas_origen",
+		                each Table.RowCount(_),
+		                Int64.Type
+		            },
+		            {
+		                "Versiones_geografia",
+		                each Table.RowCount(
+		                    Table.Distinct(
+		                        Table.SelectColumns(
+		                            _,
+		                            {
+		                                "Paises_Produccion",
+		                                "Codigos_Pais_ISO"
+		                            }
+		                        )
+		                    )
+		                ),
+		                Int64.Type
+		            }
+		        }
+		    ),
+		
+		    Control = #table(
+		        {"Control", "Cantidad"},
+		        {
+		            {"Total de filas", Table.RowCount(Origen)},
+		            {
+		                "Filas sin clave",
+		                Table.RowCount(Origen) - Table.RowCount(ConClave)
+		            },
+		            {"Claves distintas", Table.RowCount(Agrupadas)},
+		            {
+		                "Claves repetidas",
+		                Table.RowCount(
+		                    Table.SelectRows(
+		                        Agrupadas,
+		                        each [Filas_origen] > 1
+		                    )
+		                )
+		            },
+		            {
+		                "Claves con datos geográficos diferentes",
+		                Table.RowCount(
+		                    Table.SelectRows(
+		                        Agrupadas,
+		                        each [Versiones_geografia] > 1
+		                    )
+		                )
+		            }
+		        }
+		    ),
+		
+		    Tipos = Table.TransformColumnTypes(
+		        Control,
+		        {
+		            {"Control", type text},
+		            {"Cantidad", Int64.Type}
+		        }
+		    )
+		in
+		    Tipos
+	lineageTag: a1a710c5-0b47-4ab0-8789-c94ec57f3048
+	queryGroup: '4. Controles'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Control_Integracion_Geografia =
+		let
+		    Origen = Peliculas_Geografia_Final,
+		
+		    Resumen = Table.Group(
+		        Origen,
+		        {"Estado_Integracion_Geografia"},
+		        {
+		            {
+		                "Cantidad_Peliculas",
+		                each Table.RowCount(_),
+		                Int64.Type
+		            }
+		        }
+		    )
+		in
+		    Resumen
+	lineageTag: a4f16795-35dd-41ac-af63-5099eaa97d0c
+	queryGroup: '4. Controles'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Exception
+
+expression Control_Oscars =
+		let
+		    Origen = Oscars_Preparados,
+		
+		    Resumen = Table.Group(
+		        Origen,
+		        {"Estado_Integracion_Oscar"},
+		        {
+		            {
+		                "Filas_Detalle",
+		                each Table.RowCount(_),
+		                Int64.Type
+		            },
+		            {
+		                "Registros_Origen",
+		                each List.Count(
+		                    List.Distinct([Fila_Origen_Oscar])
+		                ),
+		                Int64.Type
+		            },
+		            {
+		                "Peliculas_Vinculadas",
+		                each List.Count(
+		                    List.Distinct(
+		                        List.RemoveNulls([Id_Pelicula])
+		                    )
+		                ),
+		                Int64.Type
+		            }
+		        }
+		    )
+		in
+		    Resumen
+	lineageTag: d42367f7-3113-4117-bcb3-f1b9d0667edf
+	queryGroup: '4. Controles'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Revision_Oscars_Sin_Asignar =
+		let
+		    Origen = Oscars_Preparados,
+		
+		    SinAsignar = Table.SelectRows(
+		        Origen,
+		        each [Estado_Integracion_Oscar] = "Sin asignación"
+		    ),
+		
+		    Columnas = Table.SelectColumns(
+		        SinAsignar,
+		        {
+		            "Fila_Origen_Oscar",
+		            "Titulo_Oscar",
+		            "Anio_Estreno",
+		            "Director_Oscar",
+		            "Clave_Busqueda"
+		        }
+		    ),
+		
+		    UnaFilaPorRegistro = Table.Distinct(Columnas),
+		
+		    Ordenadas = Table.Sort(
+		        UnaFilaPorRegistro,
+		        {
+		            {"Anio_Estreno", Order.Descending},
+		            {"Titulo_Oscar", Order.Ascending}
+		        }
+		    )
+		in
+		    Ordenadas
+	lineageTag: 1921b86e-c20d-40d6-82a1-98ec1fb6f9b0
+	queryGroup: '4. Controles'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "30daa123639c9e62a1a1",
+  "displayName": "5. Países, estudios y directores",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280
+}

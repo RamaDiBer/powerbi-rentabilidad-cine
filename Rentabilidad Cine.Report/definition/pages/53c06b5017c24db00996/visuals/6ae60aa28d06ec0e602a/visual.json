@@ -1,0 +1,180 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "6ae60aa28d06ec0e602a",
+  "position": {
+    "x": 0,
+    "y": 301.42857142857144,
+    "z": 0,
+    "height": 351.42857142857144,
+    "width": 1268.5714285714287,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Peliculas"
+                    }
+                  },
+                  "Property": "Pósters"
+                }
+              },
+              "queryRef": "Fact_Peliculas.Pósters",
+              "nativeQueryRef": "Póster"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Oscars"
+                    }
+                  },
+                  "Property": "Categoria"
+                }
+              },
+              "queryRef": "Fact_Oscars.Categoria",
+              "nativeQueryRef": "Premios Óscars"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Peliculas"
+                    }
+                  },
+                  "Property": "Género"
+                }
+              },
+              "queryRef": "Fact_Peliculas.Género",
+              "nativeQueryRef": "Género"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Peliculas"
+                    }
+                  },
+                  "Property": "Título"
+                }
+              },
+              "queryRef": "Fact_Peliculas.Título",
+              "nativeQueryRef": "Título"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Peliculas"
+                    }
+                  },
+                  "Property": "Premiada Óscar"
+                }
+              },
+              "queryRef": "Fact_Peliculas.Premiada Óscar",
+              "nativeQueryRef": "Premiado"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fact_Peliculas"
+                        }
+                      },
+                      "Property": "Presupuesto_usd"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Fact_Peliculas.Presupuesto_usd)",
+              "nativeQueryRef": "Presupuesto_usd",
+              "displayName": "Presupuesto_usd"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fact_Peliculas"
+                        }
+                      },
+                      "Property": "Ingresos_usd"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Fact_Peliculas.Ingresos_usd)",
+              "nativeQueryRef": "Ingresos_usd",
+              "displayName": "Ingresos_usd"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Balance estimado películas con Óscar"
+                }
+              },
+              "queryRef": "Medidas.Balance estimado películas con Óscar",
+              "nativeQueryRef": "Ganancia",
+              "displayName": "Ganancia"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "ROI películas con Óscar"
+                }
+              },
+              "queryRef": "Medidas.ROI películas con Óscar",
+              "nativeQueryRef": "ROI_retorno_de_inversion_oscars"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Fact_Peliculas"
+                  }
+                },
+                "Property": "Título"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

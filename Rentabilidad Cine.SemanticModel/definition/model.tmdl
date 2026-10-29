@@ -1,0 +1,49 @@
+model Model
+	culture: es-ES
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-AR
+	maxParallelismPerRefresh: 1
+	dataAccessOptions
+		fastCombine
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup '0. Parámetros'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup '1. Fuentes'
+
+	annotation PBI_QueryGroupOrder = 1
+
+queryGroup '2. Preparación'
+
+	annotation PBI_QueryGroupOrder = 2
+
+queryGroup '3. Integración'
+
+	annotation PBI_QueryGroupOrder = 3
+
+queryGroup '4. Controles'
+
+	annotation PBI_QueryGroupOrder = 4
+
+queryGroup '5. Modelo'
+
+	annotation PBI_QueryGroupOrder = 5
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Carpeta_Datos","Peliculas_Revision","Puntuaciones_Revision","Geografia_Revision","Oscars_Preparados","IPC_Anual_USA","Peliculas_Texto","Revision_Coincidencias","Peliculas_Preparadas","Puntuaciones_Agrupadas","Puntuaciones_Preparadas","Puntuaciones_Alternativas","Mapa_Puntuaciones_Alternativas","Geografia_Preparada","Peliculas_Integradas","Revision_Sin_Puntuacion","Revision_Candidatas_Puntuaciones","Puntuaciones_Recuperadas","Peliculas_Con_Puntuaciones","Peliculas_Con_Geografia","Peliculas_Geografia_Final","Control_Filas","Control_Calidad","Control_Integracion_Puntuaciones","Control_Claves_Alternativas","Control_Candidatas","Control_Asignaciones_Puntuaciones","Control_Geografia","Control_Integracion_Geografia","Control_Oscars","Revision_Oscars_Sin_Asignar","Fact_Peliculas","Fact_Oscars","Puente_Pelicula_Pais","Puente_Pelicula_Subgenero"]
+
+annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling"]
+
+ref table Puente_Pelicula_Pais
+ref table Fact_Peliculas
+ref table Medidas
+ref table Fact_Oscars
+ref table Puente_Pelicula_Subgenero
+ref table Oscar_Ganadores
+
+ref cultureInfo es-ES
+

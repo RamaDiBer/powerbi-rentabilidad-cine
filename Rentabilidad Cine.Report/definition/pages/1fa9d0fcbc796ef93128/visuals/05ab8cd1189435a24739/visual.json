@@ -1,0 +1,111 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "05ab8cd1189435a24739",
+  "position": {
+    "x": 20,
+    "y": 72,
+    "z": 2000,
+    "height": 633,
+    "width": 615,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "1. Ser rentable no es lo mismo que ser un éxito. ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "El 70 % de las películas recupera lo invertido, pero solo el 42 % llega a 2,5 veces el presupuesto, el umbral para cubrir marketing y la parte de los cines. La película típica gana 99 % sobre su presupuesto (taquilla total 2,9x).",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "2. La calidad es el factor más fuerte. ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "Con calificación menor a 5, el ROI mediano es −24 % y solo el 19 % es éxito. Con 8 o más, el ROI mediano es 483 %, el 83 % es éxito y el 95 % es rentable. La relación sube en cada escalón de calificación.",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "3. El Óscar acompaña al éxito. ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "Las 238 películas premiadas tienen ROI mediano de 625 % y 93 % de éxito comercial, contra 41 % del resto. Ojo: muchas son clásicos que siguieron recaudando por décadas, así que el premio es más señal de calidad que causa.",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "4. El presupuesto tiene forma de U. ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "Lo más riesgoso es el rango medio (15-40 M): ROI mediano 55 % y 34 % de éxito. Las de más de 100 M son las más seguras (88 % rentables, 51 % éxito). Las de menos de 5 M muestran ROI altísimos, pero en parte por sesgo de supervivencia: solo se registran las chicas que llegaron a los cines.",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "5. Terror es el género más eficiente. ",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "Con presupuesto mediano de 9 M logra ROI mediano de 158 % y 52 % de éxito. Animación (141 %) y Aventura (125 %) rinden bien con presupuestos altos. Drama (70 %), Crimen (64 %), Suspense (55 %), Bélica (52 %) e Historia (−25 %) quedan abajo.",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

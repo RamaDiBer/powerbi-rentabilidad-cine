@@ -1,0 +1,141 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "7f00ebaaae12afa66d00",
+  "position": {
+    "x": 9.2325724675793062,
+    "y": 0,
+    "z": 0,
+    "height": 1080.2109787067789,
+    "width": 1911.1425007889163,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fact_Oscars"
+                        }
+                      },
+                      "Property": "Anio_Ceremonia"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Fact_Oscars.Anio_Ceremonia)",
+              "nativeQueryRef": "Suma de Anio_Ceremonia"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Oscars"
+                    }
+                  },
+                  "Property": "Categoria"
+                }
+              },
+              "queryRef": "Fact_Oscars.Categoria",
+              "nativeQueryRef": "Categoria"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Oscars"
+                    }
+                  },
+                  "Property": "Estado_Integracion_Oscar"
+                }
+              },
+              "queryRef": "Fact_Oscars.Estado_Integracion_Oscar",
+              "nativeQueryRef": "Estado_Integracion_Oscar"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Oscars"
+                    }
+                  },
+                  "Property": "Id_Pelicula"
+                }
+              },
+              "queryRef": "Fact_Oscars.Id_Pelicula",
+              "nativeQueryRef": "Id_Pelicula"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fact_Oscars"
+                        }
+                      },
+                      "Property": "Fila_Origen_Oscar"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Fact_Oscars.Fila_Origen_Oscar)",
+              "nativeQueryRef": "Suma de Fila_Origen_Oscar"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Oscars"
+                    }
+                  },
+                  "Property": "Premio_Original"
+                }
+              },
+              "queryRef": "Fact_Oscars.Premio_Original",
+              "nativeQueryRef": "Premio_Original"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "269.0234254346744D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Fact_Oscars.Categoria"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {}
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

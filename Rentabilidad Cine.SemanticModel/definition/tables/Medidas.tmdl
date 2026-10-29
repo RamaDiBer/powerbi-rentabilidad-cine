@@ -1,0 +1,423 @@
+table Medidas
+	lineageTag: 1669320c-df57-4e32-ad3b-58e5a6e6ac39
+
+	measure 'Ingresos Totales' =
+			
+			CALCULATE(
+			    SUM(Fact_Peliculas[Ingresos_usd]),
+			    KEEPFILTERS(Fact_Peliculas[Es_Evaluable_Financiera] = TRUE())
+			)
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: 5c5f42ca-d12f-4fd0-a5f9-5decb60fbbcc
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	measure '% Peliculas Rentables' =
+			
+			DIVIDE(
+			    [Peliculas Rentables],
+			    [Peliculas Evaluables]
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: b56373a0-d9b5-4001-93e3-d49ce6f7fc64
+
+	measure 'Calificacion Promedio' =
+			
+			AVERAGEX(
+			    FILTER(
+			        Fact_Peliculas,
+			        Fact_Peliculas[Estado_Integracion_Puntuaciones]
+			            = "Con calificación y votos"
+			    ),
+			    Fact_Peliculas[Calificacion_TMDb]
+			)
+		lineageTag: b5c59762-5b3d-440a-97ba-12c3b54f212a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Cantidad Películas base' =
+			
+			[Total Películas]
+		formatString: 0
+		lineageTag: f147655f-0a10-401c-94f5-5cf6efe0091f
+
+	measure 'Ganancia Promedio' =
+			
+			DIVIDE(
+			    [Ganancia_estimada_base],
+			    [Peliculas Evaluables]
+			)
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: 00f14c49-97ab-4b9f-825a-1d4629158cc4
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	measure Ganancia_estimada_base =
+			
+			[Ingresos Totales] - [Presupuesto Total]
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: b420f635-27eb-48d3-920d-cc540ddc2808
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	measure Ganancia_total =
+			
+			[Ganancia_estimada_base]
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: 3e64cb51-1812-44d9-89cc-614c201ca15d
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	measure KPI_Total_Peliculas_HTML =
+			
+			// 1. Calculamos el valor y le damos formato con separador de miles
+			VAR TotalPeliculas = FORMAT(COUNTROWS('Fact_Peliculas'), "#,##0")
+			
+			// 2. Definimos variables de diseño (puedes cambiar los colores HEX)
+			VAR FondoCard = "linear-gradient(135deg, #141E30 0%, #243B55 100%)" // Degradado moderno oscuro
+			VAR ColorTexto = "#FFFFFF"
+			VAR ColorSubtitulo = "#B0BEC5"
+			
+			// 3. Estructuramos el HTML y CSS
+			RETURN
+			"<div style='
+			    background: " & FondoCard & ";
+			    border-radius: 16px;
+			    box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+			    padding: 24px;
+			    width: 100%;
+			    height: 100%;
+			    display: flex;
+			    flex-direction: column;
+			    justify-content: center;
+			    align-items: center;
+			    font-family: ""Segoe UI"", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+			    box-sizing: border-box;
+			    transition: transform 0.3s ease;
+			'>
+			    <div style='
+			        font-size: 14px;
+			        color: " & ColorSubtitulo & ";
+			        text-transform: uppercase;
+			        letter-spacing: 2px;
+			        font-weight: 600;
+			        margin-bottom: 8px;
+			        text-align: center;
+			    '>
+			        Total de Películas
+			    </div>
+			    <div style='
+			        font-size: 42px;
+			        font-weight: 800;
+			        color: " & ColorTexto & ";
+			        margin: 0;
+			        line-height: 1;
+			        text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+			    '>
+			        " & TotalPeliculas & "
+			    </div>
+			    <div style='
+			        margin-top: 12px;
+			        width: 40px;
+			        height: 4px;
+			        background-color: #00C6FF; /* Acento de color (celeste/cian) */
+			        border-radius: 2px;
+			    '></div>
+			</div>"
+		lineageTag: 1ea2f080-cf33-499b-8bb4-1208de4e2599
+
+	measure 'Peliculas Rentables' =
+			
+			COUNTROWS(
+			    FILTER(
+			        Fact_Peliculas,
+			        Fact_Peliculas[Es_Evaluable_Financiera] = TRUE()
+			            && Fact_Peliculas[Ingresos_usd]
+			                > Fact_Peliculas[Presupuesto_usd]
+			    )
+			) + 0
+		formatString: 0
+		lineageTag: d66fee65-3b83-477c-b086-188ab7f19581
+
+	measure 'Popularidad Promedio' =
+			
+			AVERAGE(Fact_Peliculas[Popularidad])
+		lineageTag: ee8ec3cf-a7d1-4ee9-ad5f-5ed5507e13c4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Presupuesto Total' =
+			
+			CALCULATE(
+			    SUM(Fact_Peliculas[Presupuesto_usd]),
+			    KEEPFILTERS(Fact_Peliculas[Es_Evaluable_Financiera] = TRUE())
+			)
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: 89932553-dc93-4292-a485-50f13e600dd0
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	measure ROI =
+			
+			DIVIDE(
+			    [Ganancia_estimada_base],
+			    [Presupuesto Total]
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 411824df-5e9a-47b5-8e50-c4fb66e9920c
+
+	measure 'ROI Promedio' =
+			
+			AVERAGEX(
+			    FILTER(
+			        Fact_Peliculas,
+			        Fact_Peliculas[Es_Evaluable_Financiera] = TRUE()
+			    ),
+			    DIVIDE(
+			        Fact_Peliculas[Ingresos_usd] - Fact_Peliculas[Presupuesto_usd],
+			        Fact_Peliculas[Presupuesto_usd]
+			    )
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 06770e65-b14e-4982-bb48-73d2ef72e13d
+
+	measure 'Total Películas' =
+			
+			COUNTROWS(Fact_Peliculas)
+		formatString: 0
+		lineageTag: 4a5e7a6e-909c-4074-917d-3283679410fb
+
+	measure Total_Presupuesto =
+			
+			[Presupuesto Total]
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: 42693d8e-a9c1-4847-b478-4cf864d6a041
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	measure 'Peliculas Evaluables' =
+			
+			CALCULATE(
+			    COUNTROWS(Fact_Peliculas),
+			    KEEPFILTERS(Fact_Peliculas[Es_Evaluable_Financiera] = TRUE())
+			) + 0
+		formatString: 0
+		lineageTag: 7fa4953b-a321-43df-97cf-0b87a092923b
+
+	measure 'ROI películas con Óscar' =
+			
+			VAR PeliculasSeleccionadas =
+			    VALUES(Fact_Oscars[Id_Pelicula])
+			RETURN
+			    CALCULATE(
+			        [ROI],
+			        KEEPFILTERS(
+			            TREATAS(
+			                PeliculasSeleccionadas,
+			                Fact_Peliculas[Id_Pelicula]
+			            )
+			        )
+			    )
+		lineageTag: d964ebe4-03b4-4ebe-90db-8b4298617596
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Balance estimado películas con Óscar' =
+			
+			VAR PeliculasSeleccionadas =
+			    VALUES(Fact_Oscars[Id_Pelicula])
+			RETURN
+			    CALCULATE(
+			        [Ganancia_estimada_base],
+			        KEEPFILTERS(
+			            TREATAS(
+			                PeliculasSeleccionadas,
+			                Fact_Peliculas[Id_Pelicula]
+			            )
+			        )
+			    )
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: 6bc200ff-a31c-4512-9d64-c3365402211b
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	measure 'Películas con Óscar registrado' =
+			
+			DISTINCTCOUNT(Fact_Oscars[Id_Pelicula])
+		formatString: 0
+		lineageTag: dea39730-54b7-44fe-9855-bebd4d1afb86
+
+	measure 'Premios Óscar registrados' =
+			
+			COUNTROWS(Fact_Oscars)
+		formatString: 0
+		lineageTag: 25d71997-3e50-4b65-9f50-5ff6e4927cbc
+
+	measure 'Control IDs duplicados' =
+			
+			COUNTROWS(Fact_Peliculas)
+			    - DISTINCTCOUNT(Fact_Peliculas[Id_Pelicula])
+		formatString: 0
+		lineageTag: 147b3d58-7073-46c2-875a-7a2009749c59
+
+	measure 'Control IDs vacíos' =
+			
+			COUNTROWS(
+			    FILTER(
+			        Fact_Peliculas,
+			        ISBLANK(Fact_Peliculas[Id_Pelicula])
+			    )
+			) + 0
+		formatString: 0
+		lineageTag: afc014f6-8077-4abb-bd84-c3062df143b6
+
+	measure 'ROI Genero' =
+			
+			DIVIDE(
+			    [Ganancia_total],
+			    [Total_Presupuesto]
+			) * 100
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 8dad6567-45e3-4e21-9ea8-6194ca458184
+
+	/// ROI de la película típica: mediana de (taquilla - presupuesto) / presupuesto entre las películas evaluables. No lo distorsionan los casos extremos.
+	measure 'ROI Mediano' =
+			
+			MEDIANX(
+			    FILTER(
+			        Fact_Peliculas,
+			        Fact_Peliculas[Es_Evaluable_Financiera] = TRUE()
+			    ),
+			    DIVIDE(
+			        Fact_Peliculas[Ingresos_usd] - Fact_Peliculas[Presupuesto_usd],
+			        Fact_Peliculas[Presupuesto_usd]
+			    )
+			)
+		formatString: 0.0 %;-0.0 %;0.0 %
+		displayFolder: KPIs rentabilidad
+		lineageTag: 081c1470-29d4-4cc9-b335-0d0c1a3b0162
+
+	/// Cuántas veces la taquilla total cubre el presupuesto total.
+	measure 'Multiplicador Taquilla' =
+			
+			DIVIDE([Ingresos Totales], [Presupuesto Total])
+		formatString: 0.00"x"
+		displayFolder: KPIs rentabilidad
+		lineageTag: e4255659-4bc9-4578-86ab-33eae28cc25a
+
+	/// Películas evaluables cuya taquilla es al menos 2,5 veces el presupuesto (umbral de la industria para cubrir marketing y la parte de los cines).
+	measure 'Peliculas Exito 2,5x' =
+			
+			COUNTROWS(
+			    FILTER(
+			        Fact_Peliculas,
+			        Fact_Peliculas[Es_Evaluable_Financiera] = TRUE()
+			            && Fact_Peliculas[Ingresos_usd] >= 2.5 * Fact_Peliculas[Presupuesto_usd]
+			    )
+			) + 0
+		formatString: 0
+		displayFolder: KPIs rentabilidad
+		lineageTag: 5139ce66-bcb8-41a3-b066-41164a9935f3
+
+	/// Porcentaje de películas evaluables con taquilla de al menos 2,5 veces el presupuesto.
+	measure '% Éxito comercial (2,5x)' =
+			
+			DIVIDE([Peliculas Exito 2,5x], [Peliculas Evaluables])
+		formatString: 0.0 %;-0.0 %;0.0 %
+		displayFolder: KPIs rentabilidad
+		lineageTag: 8fd89020-2196-4502-b9a1-d4642bc5118e
+
+	/// Presupuesto de la película típica (mediana) entre las evaluables.
+	measure 'Presupuesto Mediano' =
+			
+			MEDIANX(
+			    FILTER(
+			        Fact_Peliculas,
+			        Fact_Peliculas[Es_Evaluable_Financiera] = TRUE()
+			    ),
+			    Fact_Peliculas[Presupuesto_usd]
+			)
+		formatString: \$ #,0
+		displayFolder: KPIs rentabilidad
+		lineageTag: d60d9dfd-f9af-410f-8705-0bbdb7f8e430
+
+	/// Lista de todos los subgéneros de la película según el puente.
+	measure 'Subgéneros de la película' =
+			CALCULATE(
+			    CONCATENATEX(
+			        VALUES(Puente_Pelicula_Subgenero[Subgénero]),
+			        Puente_Pelicula_Subgenero[Subgénero],
+			        ", ",
+			        Puente_Pelicula_Subgenero[Subgénero], ASC
+			    ),
+			    REMOVEFILTERS(Puente_Pelicula_Subgenero[Subgénero])
+			)
+		displayFolder: Subgéneros
+		lineageTag: 8a194e9a-47be-44b8-9a13-b02f9af1419e
+
+	measure 'Asignaciones película-subgénero' = COUNTROWS(Puente_Pelicula_Subgenero)
+		formatString: #,0
+		displayFolder: Subgéneros
+		lineageTag: 2adc9b53-aa75-4fd3-8bd5-2c96f939e5c0
+
+	measure 'Películas con subgénero' = DISTINCTCOUNT(Puente_Pelicula_Subgenero[Id_Pelicula])
+		formatString: #,0
+		displayFolder: Subgéneros
+		lineageTag: 1fb3c236-b940-42fb-a1e0-f259e019d2c4
+
+	measure 'Promedio subgéneros por película' = DIVIDE([Asignaciones película-subgénero], [Películas con subgénero])
+		formatString: 0.00
+		displayFolder: Subgéneros
+		lineageTag: a0d7940e-25a7-42ea-b23d-218989a76982
+
+	measure 'Películas con 2 o más subgéneros' = COUNTROWS(FILTER(Fact_Peliculas, Fact_Peliculas[Cantidad subgéneros] >= 2)) + 0
+		formatString: #,0
+		displayFolder: Subgéneros
+		lineageTag: eae32838-728a-4e27-b812-6d34f0bf24ef
+
+	measure 'Películas atípicas excluidas' = COUNTROWS(FILTER(Fact_Peliculas, NOT ISBLANK(Fact_Peliculas[Motivo atípico]))) + 0
+		formatString: #,0
+		displayFolder: Calidad de datos
+		lineageTag: beb29387-8bd8-4192-bc16-4aca17fd9cd0
+
+	measure 'Óscar ganados (personas)' = COUNTROWS(Oscar_Ganadores)
+		formatString: #,0
+		displayFolder: Óscar
+		lineageTag: 96e9af5b-ce15-43c0-b45c-5850f7276be4
+
+	/// Presupuesto mediano ajustado por inflación a dólares de 2025.
+	measure 'Presupuesto Mediano 2025' =
+			MEDIANX(
+			    FILTER(Fact_Peliculas, Fact_Peliculas[Es_Evaluable_Financiera] = TRUE()),
+			    Fact_Peliculas[Presupuesto_USD_2025]
+			)
+		formatString: \$ #,0
+		displayFolder: KPIs rentabilidad
+		lineageTag: b22c4da0-928b-48eb-b892-294e0b3d88b7
+
+	/// Taquilla mediana ajustada por inflación a dólares de 2025.
+	measure 'Ingresos Mediano 2025' =
+			MEDIANX(
+			    FILTER(Fact_Peliculas, Fact_Peliculas[Es_Evaluable_Financiera] = TRUE()),
+			    Fact_Peliculas[Ingresos_USD_2025]
+			)
+		formatString: \$ #,0
+		displayFolder: KPIs rentabilidad
+		lineageTag: 05caf33e-41a7-4859-888b-2b7d0d4a2f1d
+
+	column Auxiliar
+		isHidden
+		formatString: 0
+		lineageTag: 7d94c19e-d685-4338-9877-24b76e9a966f
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Auxiliar]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Medidas = calculated
+		mode: import
+		source = ROW("Auxiliar", 1)
+
+	annotation PBI_Id = e6dfb53a06904d92b9faada818dcfbd8
+

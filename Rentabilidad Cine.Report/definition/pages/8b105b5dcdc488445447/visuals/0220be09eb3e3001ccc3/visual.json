@@ -1,0 +1,215 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "0220be09eb3e3001ccc3",
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "height": 720.43167458377536,
+    "width": 1279.3506433611585,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "% Peliculas Rentables"
+                }
+              },
+              "queryRef": "Medidas.% Peliculas Rentables",
+              "nativeQueryRef": "% Peliculas Rentables"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Peliculas"
+                    }
+                  },
+                  "Property": "Año de estreno"
+                }
+              },
+              "queryRef": "Fact_Peliculas.Año de estreno",
+              "nativeQueryRef": "Año de estreno1"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Puente_Pelicula_Pais"
+                    }
+                  },
+                  "Property": "Fila_Excel"
+                }
+              },
+              "queryRef": "Puente_Pelicula_Pais.Fila_Excel",
+              "nativeQueryRef": "Fila_Excel"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Puente_Pelicula_Subgenero"
+                    }
+                  },
+                  "Property": "Id_Pelicula"
+                }
+              },
+              "queryRef": "Puente_Pelicula_Subgenero.Id_Pelicula",
+              "nativeQueryRef": "Id_Pelicula"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Oscars"
+                    }
+                  },
+                  "Property": "Categoria"
+                }
+              },
+              "queryRef": "Fact_Oscars.Categoria",
+              "nativeQueryRef": "Categoria"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Peliculas"
+                    }
+                  },
+                  "Property": "Género"
+                }
+              },
+              "queryRef": "Fact_Peliculas.Género",
+              "nativeQueryRef": "Género1"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Puente_Pelicula_Subgenero"
+                    }
+                  },
+                  "Property": "Subgénero"
+                }
+              },
+              "queryRef": "Puente_Pelicula_Subgenero.Subgénero",
+              "nativeQueryRef": "Subgénero2"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "65.45706437052253D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.% Peliculas Rentables"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "77.45816558924479D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Puente_Pelicula_Subgenero.Id_Pelicula"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "89.5043650761862D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Puente_Pelicula_Pais.Fila_Excel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "95.23295297137871D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Fact_Peliculas.Año de estreno"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "104.81616125258707D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Fact_Peliculas.Subgénero"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "127.7721142292539D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Puente_Pelicula_Subgenero.Subgénero"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {}
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

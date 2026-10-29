@@ -1,0 +1,484 @@
+table Fact_Peliculas
+	lineageTag: f3c50778-9f19-483c-aa9c-d4bcc1e7fd9b
+
+	column Id_Pelicula
+		dataType: int64
+		formatString: 0
+		lineageTag: f32f1177-27fa-42e0-b535-85ec0004546b
+		summarizeBy: none
+		sourceColumn: Id_Pelicula
+
+		annotation SummarizationSetBy = Automatic
+
+	column Título
+		dataType: string
+		lineageTag: 11d17f64-f379-434f-905a-7446f9f2ad0b
+		summarizeBy: none
+		sourceColumn: Título
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Año de estreno'
+		dataType: int64
+		formatString: 0
+		lineageTag: c1782a21-b072-4b07-b0cc-a1ea33b0a957
+		summarizeBy: none
+		sourceColumn: Año de estreno
+
+		annotation SummarizationSetBy = Automatic
+
+	column Género
+		dataType: string
+		lineageTag: 8616fa1a-f317-4bf1-9524-b9cc6a52cca6
+		summarizeBy: none
+		sourceColumn: Género
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Subgénero
+		dataType: string
+		isHidden
+		lineageTag: e02d9530-ccac-43a9-b01e-c6c412cc1d8b
+		summarizeBy: none
+		sourceColumn: Subgénero
+
+		annotation SummarizationSetBy = Automatic
+
+	column Presupuesto_usd
+		dataType: decimal
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: 81dba427-2e1f-4495-b3b5-32091343e28f
+		summarizeBy: sum
+		sourceColumn: Presupuesto_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	column Ingresos_usd
+		dataType: decimal
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: 0352a716-df93-4e48-911d-e6390d3aed34
+		summarizeBy: sum
+		sourceColumn: Ingresos_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	column Director
+		dataType: string
+		lineageTag: 3f7817b5-711b-472d-a6e3-f44f344c5f18
+		summarizeBy: none
+		sourceColumn: Director
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estudios cinematográficos'
+		dataType: string
+		lineageTag: 42478316-656c-4b7d-93b3-2577302e7fda
+		summarizeBy: none
+		sourceColumn: Estudios cinematográficos
+
+		annotation SummarizationSetBy = Automatic
+
+	column Calificacion_TMDb
+		dataType: double
+		lineageTag: 2f2d912b-5e1c-4eca-84e9-d8653f796f1a
+		summarizeBy: sum
+		sourceColumn: Calificacion_TMDb
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Total_Votos
+		dataType: int64
+		formatString: 0
+		lineageTag: 67309c85-9401-4e73-9dfb-fda21602eb37
+		summarizeBy: sum
+		sourceColumn: Total_Votos
+
+		annotation SummarizationSetBy = Automatic
+
+	column Popularidad
+		dataType: double
+		lineageTag: ec51e62f-71ec-4a1f-b56a-b8e836a994dc
+		summarizeBy: sum
+		sourceColumn: Popularidad
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Estado_Integracion_Puntuaciones
+		dataType: string
+		lineageTag: 796ca2db-1a49-4845-858e-5bfa5b853b69
+		summarizeBy: none
+		sourceColumn: Estado_Integracion_Puntuaciones
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Integracion_Geografia
+		dataType: string
+		lineageTag: 337ea022-ecd3-41ca-a86e-b4a43dbf0910
+		summarizeBy: none
+		sourceColumn: Estado_Integracion_Geografia
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Dato_Pais
+		dataType: string
+		lineageTag: 671c723d-e6c9-4fb2-8628-90420661d7e2
+		summarizeBy: none
+		sourceColumn: Estado_Dato_Pais
+
+		annotation SummarizationSetBy = Automatic
+
+	column IPC_Anual
+		dataType: double
+		lineageTag: 53dc721e-0b27-490e-b27b-90c3beb3d331
+		summarizeBy: sum
+		sourceColumn: IPC_Anual
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Factor_2025
+		dataType: double
+		lineageTag: 71d4f9a5-95f7-4472-9279-50552a22d80e
+		summarizeBy: sum
+		sourceColumn: Factor_2025
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Presupuesto_USD_2025
+		dataType: decimal
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: 1a22cd25-37b9-42a4-a651-95ec9d9f1d8f
+		summarizeBy: sum
+		sourceColumn: Presupuesto_USD_2025
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	column Ingresos_USD_2025
+		dataType: decimal
+		formatString: \$\ #,0.###############;-\$\ #,0.###############;\$\ #,0.###############
+		lineageTag: b418d336-517a-4b99-b2d8-cef7ce4af82a
+		summarizeBy: sum
+		sourceColumn: Ingresos_USD_2025
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	column Estado_Inflacion
+		dataType: string
+		lineageTag: 640bb92b-edf2-4ea0-9e63-188936ada334
+		summarizeBy: none
+		sourceColumn: Estado_Inflacion
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pósters
+		dataType: string
+		lineageTag: 1090f156-38ed-4ebf-9570-144fcac61d50
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: Pósters
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Calidad_Financiera
+		dataType: string
+		lineageTag: b42f0e9f-153a-40c5-8de8-e86676f046d5
+		summarizeBy: none
+		sourceColumn: Estado_Calidad_Financiera
+
+		annotation SummarizationSetBy = Automatic
+
+	column Es_Evaluable_Financiera = ```
+			
+			    Fact_Peliculas[Estado_Calidad_Financiera]
+			        = "Sin alerta en revisión inicial"
+			        && Fact_Peliculas[Presupuesto_usd] > 0
+			        && Fact_Peliculas[Ingresos_usd] > 0
+			        && ISBLANK(Fact_Peliculas[Motivo atípico])
+			```
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 14d53005-72e0-469f-a306-aec10f38f53f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Década de estreno (1990 = años 1990-1999).
+	column Década = INT(Fact_Peliculas[Año de estreno] / 10) * 10
+		dataType: int64
+		formatString: 0
+		displayFolder: Análisis
+		lineageTag: b8e8d079-ee28-4cf3-81af-bef5743a4828
+		summarizeBy: none
+
+	column 'Orden Rango Presupuesto' =
+			
+			VAR P = Fact_Peliculas[Presupuesto_usd]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        P < 1000000, 1,
+			        P < 5000000, 2,
+			        P < 15000000, 3,
+			        P < 40000000, 4,
+			        P < 100000000, 5,
+			        6
+			    )
+		dataType: int64
+		isHidden
+		formatString: 0
+		displayFolder: Análisis
+		lineageTag: 6b781e46-714f-45d6-a598-62eb8f0a8aa2
+		summarizeBy: none
+
+	column 'Orden Rango Calificación' =
+			
+			VAR C = Fact_Peliculas[Calificacion_TMDb]
+			RETURN
+			    IF(
+			        ISBLANK(C) || Fact_Peliculas[Total_Votos] < 50,
+			        99,
+			        SWITCH(
+			            TRUE(),
+			            C < 5, 1,
+			            C < 6, 2,
+			            C < 6.5, 3,
+			            C < 7, 4,
+			            C < 7.5, 5,
+			            C < 8, 6,
+			            7
+			        )
+			    )
+		dataType: int64
+		isHidden
+		formatString: 0
+		displayFolder: Análisis
+		lineageTag: bd0f8b59-1fac-4490-bfb2-930748a328e3
+		summarizeBy: none
+
+	/// Tramo de presupuesto de producción en USD.
+	column 'Rango Presupuesto' =
+			
+			SWITCH(
+			    Fact_Peliculas[Orden Rango Presupuesto],
+			    1, "< 1 M",
+			    2, "1-5 M",
+			    3, "5-15 M",
+			    4, "15-40 M",
+			    5, "40-100 M",
+			    "100 M o más"
+			)
+		dataType: string
+		displayFolder: Análisis
+		lineageTag: c608f9bd-bf13-4e5e-8b6d-4072b159510a
+		summarizeBy: none
+		sortByColumn: 'Orden Rango Presupuesto'
+
+	/// Tramo de calificación TMDb. 'Sin datos' si no tiene calificación o tiene menos de 50 votos.
+	column 'Rango Calificación' =
+			
+			SWITCH(
+			    Fact_Peliculas[Orden Rango Calificación],
+			    1, "Menos de 5",
+			    2, "5 a 6",
+			    3, "6 a 6,5",
+			    4, "6,5 a 7",
+			    5, "7 a 7,5",
+			    6, "7,5 a 8",
+			    7, "8 o más",
+			    "Sin datos"
+			)
+		dataType: string
+		displayFolder: Análisis
+		lineageTag: f1d594a4-74ae-417e-9c29-9fa37e7f87eb
+		summarizeBy: none
+		sortByColumn: 'Orden Rango Calificación'
+
+	/// Indica si la película tiene al menos un Óscar vinculado en Fact_Oscars.
+	column 'Premiada Óscar' =
+			
+			IF(
+			    CALCULATE(COUNTROWS(Fact_Oscars)) > 0,
+			    "Con Óscar",
+			    "Sin Óscar"
+			)
+		dataType: string
+		displayFolder: Análisis
+		lineageTag: 5ee6f58c-58ec-4ee4-81c7-ee611f101e8e
+		summarizeBy: none
+
+	/// Primer estudio de la lista de estudios cinematográficos.
+	column 'Estudio principal' =
+			
+			VAR Lista = Fact_Peliculas[Estudios cinematográficos]
+			VAR Coma = SEARCH(",", Lista, 1, 0)
+			VAR Primero = TRIM(IF(Coma > 0, LEFT(Lista, Coma - 1), Lista))
+			RETURN
+			    IF(Primero = "", "Sin informar", Primero)
+		dataType: string
+		displayFolder: Análisis
+		lineageTag: 18b39e51-87d5-41fb-8a06-da7ed4ded51c
+		summarizeBy: none
+
+	/// Casos excluidos del análisis financiero por relación inversión/taquilla imposible o extrema. Vacío = caso normal.
+	column 'Motivo atípico' =
+			VAR P = Fact_Peliculas[Presupuesto_usd]
+			VAR I = Fact_Peliculas[Ingresos_usd]
+			VAR X = DIVIDE(I, P)
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(P) || ISBLANK(I) || P <= 0 || I <= 0, BLANK(),
+			        P < 10000, "Presupuesto menor a 10.000 USD",
+			        I < 1000, "Taquilla menor a 1.000 USD",
+			        X < 0.005, "Taquilla menor al 0,5 % del presupuesto",
+			        X > 500, "Taquilla mayor a 500 veces el presupuesto",
+			        BLANK()
+			    )
+		displayFolder: Análisis
+		lineageTag: c4c31985-d38d-4d6a-bfa7-4142a533f3fa
+
+	/// Cuántos subgéneros tiene la película en el puente.
+	column 'Cantidad subgéneros' = COUNTROWS(RELATEDTABLE(Puente_Pelicula_Subgenero)) + 0
+		formatString: 0
+		displayFolder: Análisis
+		lineageTag: 7848e483-4a3b-40cc-b5e8-6486d8b93585
+		summarizeBy: none
+
+	partition Fact_Peliculas = m
+		mode: import
+		queryGroup: '5. Modelo'
+		source =
+				let
+				    Origen = Peliculas_Geografia_Final,
+				
+				    Columnas = Table.SelectColumns(
+				        Origen,
+				        {
+				            "Fila_Excel",
+				            "Título",
+				            "Año de estreno",
+				            "Género",
+				            "Subgénero",
+				            "Presupuesto_usd",
+				            "Ingresos_usd",
+				            "Director",
+				            "Estudios cinematográficos",
+				            "Pósters",
+				            "Calificacion_TMDb",
+				            "Total_Votos",
+				            "Popularidad",
+				            "Estado_Integracion_Puntuaciones",
+				            "Estado_Integracion_Geografia",
+				            "Estado_Dato_Pais"
+				        }
+				    ),
+				
+				    ConId = Table.RenameColumns(
+				        Columnas,
+				        {{"Fila_Excel", "Id_Pelicula"}}
+				    ),
+				
+				    TextoLimpio = Table.TransformColumns(
+				        ConId,
+				        {
+				            {
+				                "Género",
+				                each
+				                    if _ = null or Text.Trim(_) = ""
+				                    then "SIN INFORMAR"
+				                    else Text.Upper(Text.Trim(_), "es-ES"),
+				                type text
+				            },
+				            {
+				                "Pósters",
+				                each
+				                    if _ = null then null
+				                    else
+				                        let
+				                            URL = Text.Trim(_)
+				                        in
+				                            if URL = "" then null else URL,
+				                type text
+				            }
+				        }
+				    ),
+				
+				    Combinadas = Table.NestedJoin(
+				        TextoLimpio,
+				        {"Año de estreno"},
+				        IPC_Anual_USA,
+				        {"Anio"},
+				        "Inflacion",
+				        JoinKind.LeftOuter
+				    ),
+				
+				    Expandidas = Table.ExpandTableColumn(
+				        Combinadas,
+				        "Inflacion",
+				        {"IPC_Anual", "Factor_2025"},
+				        {"IPC_Anual", "Factor_2025"}
+				    ),
+				
+				    PresupuestoReal = Table.AddColumn(
+				        Expandidas,
+				        "Presupuesto_USD_2025",
+				        each
+				            if [Factor_2025] = null then null
+				            else [Presupuesto_usd] * [Factor_2025],
+				        Currency.Type
+				    ),
+				
+				    IngresosReales = Table.AddColumn(
+				        PresupuestoReal,
+				        "Ingresos_USD_2025",
+				        each
+				            if [Factor_2025] = null then null
+				            else [Ingresos_usd] * [Factor_2025],
+				        Currency.Type
+				    ),
+				
+				    ConEstado = Table.AddColumn(
+				        IngresosReales,
+				        "Estado_Inflacion",
+				        each
+				            if [Factor_2025] = null
+				            then "Sin IPC anual disponible"
+				            else "Ajustado a USD 2025",
+				        type text
+				    ),
+				
+				    // Películas con importes sospechosos detectadas en la revisión manual.
+				    IdsAVerificar = {8139, 6167, 4569, 4272, 4567, 4571},
+				
+				    ConCalidadFinanciera = Table.AddColumn(
+				        ConEstado,
+				        "Estado_Calidad_Financiera",
+				        each
+				            if List.Contains(IdsAVerificar, [Id_Pelicula])
+				            then "Pendiente de verificar importes"
+				            else "Sin alerta en revisión inicial",
+				        type text
+				    )
+				in
+				    ConCalidadFinanciera
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

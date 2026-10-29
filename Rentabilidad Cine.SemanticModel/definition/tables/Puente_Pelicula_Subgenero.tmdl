@@ -1,0 +1,93 @@
+table Puente_Pelicula_Subgenero
+	lineageTag: 92661178-6f32-4b77-a7d8-2b33b93d8020
+
+	column Id_Pelicula
+		dataType: int64
+		formatString: 0
+		lineageTag: 8f7c90c9-e62f-44ef-a346-5849421fdc94
+		summarizeBy: none
+		sourceColumn: Id_Pelicula
+
+		annotation SummarizationSetBy = Automatic
+
+	column Subgénero
+		dataType: string
+		lineageTag: 6d2700e3-9ef6-47aa-9cfe-59cff7f4d066
+		summarizeBy: none
+		sourceColumn: Subgénero
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Puente_Pelicula_Subgenero = m
+		mode: import
+		queryGroup: '5. Modelo'
+		source =
+				let
+				    Origen = Table.SelectColumns(
+				        Peliculas_Texto,
+				        {"Fila_Excel", "Subgénero"}
+				    ),
+				
+				    ConId = Table.RenameColumns(
+				        Origen,
+				        {{"Fila_Excel", "Id_Pelicula"}}
+				    ),
+				
+				    ComoLista = Table.TransformColumns(
+				        ConId,
+				        {
+				            {
+				                "Subgénero",
+				                each
+				                    if _ = null then {}
+				                    else
+				                        List.Distinct(
+				                            List.Select(
+				                                List.Transform(
+				                                    Text.Split(_, ","),
+				                                    each Text.Upper(
+				                                        Text.Trim(Text.Clean(_)),
+				                                        "es-ES"
+				                                    )
+				                                ),
+				                                each not List.Contains(
+				                                    {"", "NINGUNO", "N/A", "SIN INFORMAR"},
+				                                    _
+				                                )
+				                            )
+				                        ),
+				                type list
+				            }
+				        }
+				    ),
+				
+				    EnFilas = Table.ExpandListColumn(
+				        ComoLista,
+				        "Subgénero"
+				    ),
+				
+				    // Una película sin subgéneros deja una fila vacía al expandir la lista.
+				    ConSubgenero = Table.SelectRows(
+				        EnFilas,
+				        each [Subgénero] <> null
+				    ),
+				
+				    Tipos = Table.TransformColumnTypes(
+				        ConSubgenero,
+				        {
+				            {"Id_Pelicula", Int64.Type},
+				            {"Subgénero", type text}
+				        }
+				    ),
+				
+				    Resultado = Table.Distinct(
+				        Tipos,
+				        {"Id_Pelicula", "Subgénero"}
+				    )
+				in
+				    Resultado
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

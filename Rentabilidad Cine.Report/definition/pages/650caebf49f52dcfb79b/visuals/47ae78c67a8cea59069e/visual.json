@@ -1,0 +1,94 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "47ae78c67a8cea59069e",
+  "position": {
+    "x": 20,
+    "y": 72,
+    "z": 2000,
+    "height": 110,
+    "width": 1240,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Total Películas"
+                }
+              },
+              "queryRef": "Medidas.Total Películas",
+              "nativeQueryRef": "Total Películas"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Películas con subgénero"
+                }
+              },
+              "queryRef": "Medidas.Películas con subgénero",
+              "nativeQueryRef": "Películas con subgénero"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Asignaciones película-subgénero"
+                }
+              },
+              "queryRef": "Medidas.Asignaciones película-subgénero",
+              "nativeQueryRef": "Asignaciones película-subgénero"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Promedio subgéneros por película"
+                }
+              },
+              "queryRef": "Medidas.Promedio subgéneros por película",
+              "nativeQueryRef": "Promedio subgéneros por película"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Películas con 2 o más subgéneros"
+                }
+              },
+              "queryRef": "Medidas.Películas con 2 o más subgéneros",
+              "nativeQueryRef": "Películas con 2 o más subgéneros"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

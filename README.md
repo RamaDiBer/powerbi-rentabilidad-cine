@@ -1,65 +1,67 @@
-# 🎬 Rentabilidad y factores de éxito en la industria cinematográfica
+# 🎬 What Makes a Movie Profitable?
 
 ![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
 ![DAX](https://img.shields.io/badge/DAX-1557b0?style=for-the-badge)
 ![Power Query](https://img.shields.io/badge/Power%20Query%20(M)-217346?style=for-the-badge)
-![Formato](https://img.shields.io/badge/formato-.pbip-555?style=for-the-badge)
+![Format](https://img.shields.io/badge/format-.pbip-555?style=for-the-badge)
 
-> **¿Qué hace rentable a una película?** Análisis de **8.035 películas** con presupuesto y taquilla confiables (después de excluir 104 casos atípicos), cruzando calificaciones, géneros, países y premios Óscar.
+> **What makes a movie profitable?** Analysis of **8,035 movies** with reliable budget and box-office figures (after excluding 104 outliers), combining ratings, genres, countries and Academy Awards.
 
-## 📌 Resumen
+*The report itself (page names, measures, labels) is in Spanish.*
+
+## 📌 At a glance
 
 | | |
 |---|---|
-| Consultas Power Query | 31, en 6 grupos (parámetros → fuentes → preparación → integración → controles → modelo) |
-| Modelo | Estrella con `Fact_Peliculas` al centro, 6 tablas |
-| Medidas DAX | 37 |
-| Informe | 10 páginas de análisis + páginas originales |
+| Power Query queries | 31, in 6 groups (parameters → sources → preparation → integration → checks → model) |
+| Model | Star schema with `Fact_Peliculas` at the center, 6 tables |
+| DAX measures | 37 |
+| Report | 10 analysis pages + original pages |
 
-## 🔑 Hallazgos principales
+## 🔑 Key findings
 
-1. **Rentable no es lo mismo que exitoso.** El 70 % recupera la inversión, pero solo el 42 % llega a 2,5x. El ROI mediano es 99 % y el conjunto recauda 2,9 veces lo invertido.
-2. **La calidad es el factor más fuerte.** Calificación < 5: ROI mediano −24 %. Calificación ≥ 8: ROI mediano 483 % y 83 % de éxito.
-3. **El Óscar acompaña al éxito.** Las 238 premiadas tienen ROI mediano de 625 % y 93 % de éxito.
-4. **El presupuesto tiene forma de U.** De 15 a 40 M es la zona más riesgosa (ROI 55 %). Con 100 M o más, el 88 % es rentable.
-5. **Terror es el género más eficiente:** 158 % de ROI mediano con un presupuesto mediano de 9 M.
-6. **Cada década rinde menos:** de 219 % en los 80 a 25 % en los 2020.
-7. **La mediana es el indicador correcto:** sin atípicos el ROI promedio es 372 %, la mediana 99 %.
+1. **Profitable is not the same as successful.** 70% recover their investment, but only 42% reach 2.5x. Median ROI is 99% and the whole set grosses 2.9 times what was invested.
+2. **Quality is the strongest driver.** Rating < 5: median ROI −24%. Rating ≥ 8: median ROI 483% and an 83% success rate.
+3. **Oscars go hand in hand with success.** The 238 winners have a median ROI of 625% and a 93% success rate.
+4. **Budget follows a U-shape.** 15–40 M is the riskiest range (ROI 55%). At 100 M or more, 88% are profitable.
+5. **Horror is the most efficient genre:** 158% median ROI on a median budget of 9 M.
+6. **Each decade returns less:** from 219% in the 1980s to 25% in the 2020s.
+7. **The median is the right metric:** without outliers the average ROI is 372%, the median 99%.
 
-**Recomendación:** apostar por la calidad y elegir un extremo del presupuesto (bajo costo en géneros con público fiel como terror, o grandes producciones de animación y aventura). Evitar el presupuesto medio en drama, suspenso e historia.
+**Recommendation:** bet on quality and pick one end of the budget range (low cost in genres with a loyal audience such as horror, or big animation and adventure productions). Avoid mid-range budgets in drama, thriller and history.
 
-## 🗂️ Fuentes
+## 🗂️ Sources
 
-Todas se leen desde la carpeta [`Carpeta_Datos`](Carpeta_Datos), definida en el parámetro `Carpeta_Datos` de Power Query.
+All files are read from the [`Carpeta_Datos`](Carpeta_Datos) folder, set in the `Carpeta_Datos` Power Query parameter.
 
-| Archivo | Aporta |
+| File | Provides |
 |---|---|
-| `The_movies.xlsx` | Título, año, género, subgéneros, presupuesto, taquilla, director, estudios |
-| `Puntajes_con_Calificaciones_y_Criticas.xlsx` | Calificación TMDb, votos, popularidad |
-| `Zona_Geografica_y_ROI.xlsx` | Países de producción |
-| `oscars_1927_a_presente.csv` | Premios Óscar por año y categoría |
+| `The_movies.xlsx` | Title, year, genre, subgenres, budget, box office, director, studios |
+| `Puntajes_con_Calificaciones_y_Criticas.xlsx` | TMDb rating, votes, popularity |
+| `Zona_Geografica_y_ROI.xlsx` | Production countries |
+| `oscars_1927_a_presente.csv` | Academy Awards by year and category |
 
-## 🧱 Modelo de datos
+## 🧱 Data model
 
 ```
                     Puente_Pelicula_Subgenero
-                               │ (N:1, ambas)
+                               │ (N:1, both)
 Puente_Pelicula_Pais ──► Fact_Peliculas ◄── Fact_Oscars
-     (N:1, ambas)              ▲            (N:1, única)
-                               │ (N:1, ambas)
+     (N:1, both)               ▲            (N:1, single)
+                               │ (N:1, both)
                         Oscar_Ganadores (DAX)
 ```
 
-- Se simplificó de 11 a 6 tablas eliminando dimensiones de una sola columna.
-- Las tablas puente permiten que una película cuente en **todos** sus subgéneros y países (13.275 asignaciones película-subgénero).
+- Simplified from 11 to 6 tables by removing single-column dimensions.
+- Bridge tables let a movie count in **all** of its subgenres and countries (13,275 movie–subgenre assignments).
 
-## 🧪 Técnicas destacadas
+## 🧪 Notable techniques
 
-- **Reparación de acentos** (`AcciÃ³n` → `Acción`): función M que re-decodifica Windows-1252 → UTF-8 por fila, con fallback a Latin-1.
-- **Normalización de categorías del Óscar**: los nombres que la Academia cambió con los años se unifican en categorías y áreas.
-- **Detección de atípicos con la regla de Tukey** sobre `log10(taquilla / presupuesto)` (límites Q1 − 3·IQR y Q3 + 3·IQR, redondeados a 0,5 % y 500x).
-- **Ajuste por inflación** con IPC de EE.UU. a dólares de 2025.
-- **Consultas de control** (conteos, duplicados, coincidencias) que no se cargan al modelo.
+- **Accent repair** (`AcciÃ³n` → `Acción`): an M function that re-decodes Windows-1252 → UTF-8 row by row, with a Latin-1 fallback.
+- **Oscar category normalization:** category names the Academy changed over the years are unified into categories and areas.
+- **Outlier detection with Tukey's rule** on `log10(box office / budget)` (Q1 − 3·IQR and Q3 + 3·IQR limits, rounded to 0.5% and 500x).
+- **Inflation adjustment** to 2025 dollars using the US CPI.
+- **Check queries** (counts, duplicates, matches) that are not loaded into the model.
 
 ```dax
 ROI Mediano =
@@ -72,25 +74,25 @@ MEDIANX (
 )
 ```
 
-## 📄 Páginas del informe
+## 📄 Report pages
 
-| # | Página | Pregunta |
+| # | Page | Question |
 |---|---|---|
-| 1 | Resumen | ¿Qué hace rentable a una película? |
-| 2 | Géneros | ¿Qué géneros rinden más y con qué riesgo? |
-| 3 | Presupuesto | ¿Conviene gastar más? |
-| 4 | Calidad y Óscar | ¿La calidad se traduce en taquilla? |
-| 5 | Países, estudios y directores | ¿Quién produce los éxitos? |
-| 6 | Subgéneros (control) | ¿Se cuentan todos los subgéneros? |
-| 7 | Ganadores del Óscar | ¿Quién ganó y por qué película? |
-| 8 | Casos atípicos | ¿Qué se excluyó y por qué? |
-| 9 | Género × presupuesto y tiempo | ¿Dónde conviene invertir? |
-| 10 | Conclusiones | ¿Qué aprendimos? |
+| 1 | Resumen | What makes a movie profitable? |
+| 2 | Géneros | Which genres perform best, and with what risk? |
+| 3 | Presupuesto | Does spending more pay off? |
+| 4 | Calidad y Óscar | Does quality translate into box office? |
+| 5 | Países, estudios y directores | Who produces the hits? |
+| 6 | Subgéneros (control) | Are all subgenres counted? |
+| 7 | Ganadores del Óscar | Who won, and for which movie? |
+| 8 | Casos atípicos | What was excluded, and why? |
+| 9 | Género × presupuesto y tiempo | Where is it worth investing? |
+| 10 | Conclusiones | What did we learn? |
 
-## ▶️ Cómo abrirlo
+## ▶️ How to open it
 
-1. Clonar el repo y abrir `Rentabilidad Cine.pbip` con Power BI Desktop (o directamente `Rentabilidad Cine.pbix`).
-2. En **Transformar datos → Parámetros**, apuntar `Carpeta_Datos` a la carpeta `Carpeta_Datos` del repo.
-3. Actualizar.
+1. Clone the repo and open `Rentabilidad Cine.pbip` in Power BI Desktop (or `Rentabilidad Cine.pbix` directly).
+2. Under **Transform data → Parameters**, point `Carpeta_Datos` to the repo's `Carpeta_Datos` folder.
+3. Refresh.
 
-> El documento completo del proceso está en [`Proyecto Power BI Cine qué hicimos y cómo.docx`](Proyecto%20Power%20BI%20Cine%20qu%C3%A9%20hicimos%20y%20c%C3%B3mo.docx).
+> The full write-up of the process (in Spanish) is in [`Proyecto Power BI Cine qué hicimos y cómo.docx`](Proyecto%20Power%20BI%20Cine%20qu%C3%A9%20hicimos%20y%20c%C3%B3mo.docx).
